@@ -131,8 +131,11 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     const eventHandler = (event: any) => {
         console.log(event);
         const data = JSON.parse(event.data);
-        console.log(data);
-        if (data.state === "stop") {
+
+        if (data.state === "run") {
+            setProgress(data.progress);
+        }
+        else if (data.state === "stop") {
             setImageProcessing(false);
             GetLocalCBC()
                 .then(() => {
@@ -173,7 +176,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         eventError.current = false;
         eventSource.current = new window.EventSource(eventRoute);
         eventSource.current.addEventListener(eventType, eventHandler, false);
-        eventSource.current.addEventListener(eventType, errorHandler, false);
+        eventSource.current.addEventListener("error", errorHandler, false);
     };
 
     const handleSelectChange = (value: string | any[], index: number) => {

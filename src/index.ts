@@ -29,7 +29,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     restorer: ILayoutRestorer,
     settingRegistry: ISettingRegistry | null,
     service: WebDSService ) => {
-    console.log('JupyterLab extension ${Attributes.label} is activated!11111111111');
+    console.log('JupyterLab extension ${Attributes.label} is activated!');
 
     await service.initialized;
 
@@ -37,14 +37,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const { commands, shell } = app;
     const command = Attributes.command;
 
-    console.log('JupyterLab extension QQQ 1!');
-
     commands.addCommand(command, {
       label: Attributes.label,
       caption: Attributes.caption,
 	  icon: Attributes.icon,
       execute: () => {
-		    console.log('JupyterLab extension QQQ 2!');  
         if (!widget || widget.isDisposed) {
           let content = new InitialSetupWidget(Attributes.id, service, settingRegistry);
 
@@ -55,7 +52,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
           widget.title.icon = Attributes.icon;
         }
 
-    console.log('JupyterLab extension QQQ 3!');
         if (!tracker.has(widget))
           tracker.add(widget);
 
@@ -66,7 +62,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
-    console.log('JupyterLab extension QQQ 4!');
     // Add launcher
     launcher.add({
       command: command,
