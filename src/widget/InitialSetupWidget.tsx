@@ -3,6 +3,7 @@ import React  from 'react';
 
 import { WebDSService } from '@webds/service';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import InitialSetupComponent from "./InitialSetupComponent";
 
 
 /**
@@ -27,7 +28,7 @@ export class InitialSetupWidget extends ReactWidget {
         return (
             <div id={this._id + "_container"} className="jp-webds-widget-container">
                 <div id={this._id + "_content"} className="jp-webds-widget">
-                    <></>
+                    <InitialSetupComponent service={this._service} settingRegistry={this._settingRegistry}/>
                 </div>
                 <div className="jp-webds-widget-shadow jp-webds-widget-shadow-top"></div>
                 <div className="jp-webds-widget-shadow jp-webds-widget-shadow-bottom"></div>
