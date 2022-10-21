@@ -249,7 +249,7 @@ export const Heatmap = (props: IProps): JSX.Element => {
                     alignItems="center"
                     style={{ transform: "scale(0.7)" }}
                 >
-                    <Typography sx={{ fontSize: 12 }}>{PeakMax.current}</Typography>
+                    <Typography sx={{ fontSize: 12, color: "black" }}>{PeakMax.current}</Typography>
                 </Stack>
                 <Stack
                     position="absolute"
@@ -347,9 +347,9 @@ export const Heatmap = (props: IProps): JSX.Element => {
                                         p: 0.5
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: 12 }}>X={pixelInfo[0]}</Typography>
-                                    <Typography sx={{ fontSize: 12 }}>Y={pixelInfo[1]}</Typography>
-                                    <Typography sx={{ fontSize: 12 }}>V={pixelInfo[2]}</Typography>
+                                    <Typography sx={{ color: "black", fontSize: 12 }}>X={pixelInfo[0]}</Typography>
+                                    <Typography sx={{ color: "black", fontSize: 12 }}>Y={pixelInfo[1]}</Typography>
+                                    <Typography sx={{ color: "black", fontSize: 12 }}>V={pixelInfo[2]}</Typography>
                                 </Stack>
                             )}
                         </Box>

@@ -179,13 +179,14 @@ export const ContentStepper = (props: any): JSX.Element => {
                 break;
             case "clear":
                 newState = JSON.parse(JSON.stringify(controlState));
-                //
+                tutorRef.current.clear();
                 break;
             case "accept":
                 newState.progress = 0;
                 newState.apply = 1;
                 newState.cancel = 1;
                 newState.start = 0;
+                tutorRef.current.accept();
                 break;
             case "start":
                 if (controlState.step === 0) {

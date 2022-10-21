@@ -137,10 +137,8 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         }
         else if (data.state === "stop") {
             setImageProcessing(false);
-            GetLocalCBC()
-                .then(() => {
-                    return SendGetImage("baseline");
-                })
+            setCbcCurrent(convertCbcToString(data.data));
+            SendGetImage("baseline")
                 .then((ret) => {
                     setImageB(ret);
                     dataReady.current = true;
@@ -302,13 +300,10 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         }
     }
 
-    function TutorContentApply(): JSX.Element {
-        return <>{showImages()}</>;
-    }
-
     function TutorContent(): JSX.Element {
         return (
             <Stack direction="column" spacing={3}>
+                {props.state.apply === 0 && (
                 <Stack alignItems="flex-start" direction="row" spacing={1}>
                     <Stack alignItems="flex-end" direction="column">
                         <Box
@@ -331,7 +326,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                 Image CBC (pF)
               </Typography>
                         </Box>
-                        {props.state.apply === 0 && (
                             <Box
                                 sx={{
                                     border: 1,
@@ -344,7 +338,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                     Was (pF)
                 </Typography>
                             </Box>
-                        )}
                     </Stack>
                     <Stack direction="row" style={{ overflow: "auto", width: 600 }}>
                         {cbcCurrent.map((value, index) => {
@@ -421,9 +414,12 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                             );
                         })}
                     </Stack>
-                </Stack>
+                  </Stack>
+                )}
                 {props.state.apply === 1 && (
-                    <Stack sx={{ px: 2 }}>{TutorContentApply()}</Stack>
+                    <Stack sx={{ px: 2 }}>
+                        {showImages()}
+                    </Stack>
                 )}
             </Stack>
         );
@@ -496,11 +492,13 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                     <Stack direction="column" sx={{ mt: 2 }}>
                         {showDescription()}
                     </Stack>
-                    <IconButton onClick={() => setOpenDialog(true)}>
-                        <Avatar sx={{ bgcolor: "primary.main" }}>
-                            <SettingsIcon />
-                        </Avatar>
-                    </IconButton>
+                    {props.state.apply === 0 &&
+                        <IconButton onClick={() => setOpenDialog(true)}>
+                            <Avatar sx={{ bgcolor: "primary.main" }}>
+                                <SettingsIcon />
+                            </Avatar>
+                        </IconButton>
+                    }
                 </Stack>
                 <Divider />
                 <Stack sx={{ px: 2 }}>{TutorContent()}</Stack>
@@ -536,7 +534,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                 bgcolor: "#46a832",
                                 width: (progress * PROGRESS_WIDTH) / 100,
                                 height: PROGRESS_HEIGHT,
-                                borderRadius: 5,
+                                borderRadius: 1,
                                 ml: "1px"
                             }}
                         />
@@ -563,7 +561,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                             width: PROGRESS_WIDTH,
                             height: PROGRESS_HEIGHT,
                             border: 1,
-                            borderRadius: 4
+                            borderRadius: 1
                         }}
                     />
                 </Box>

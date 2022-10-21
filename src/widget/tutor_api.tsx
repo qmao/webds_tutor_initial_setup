@@ -13,6 +13,24 @@ export async function SendUpdateStaticConfig(dataToSend): Promise<string> {
     }
 }
 
+export async function SendTutorAction(module: any, action: any, settings: any): Promise<string> {
+    const dataToSend = {
+        task: action,
+        settings
+    };
+
+    try {
+        const reply = await requestAPI<any>(`tutor/${module}`, {
+            body: JSON.stringify(dataToSend),
+            method: "POST"
+        });
+        return Promise.resolve(reply);
+    } catch (error) {
+        console.log(error);
+        return Promise.reject(`run failed: ${error.toString()}`);
+    }
+}
+
 export async function SendRun(module: any, settings: any): Promise<string> {
     const dataToSend = {
         task: "run",
