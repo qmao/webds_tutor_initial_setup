@@ -34,6 +34,7 @@ interface IProps {
     state: any;
     updateRef: any;
     updateInitState: any;
+    onAction: any;
 }
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -141,7 +142,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     useImperativeHandle(ref, () => ({
         async start() {
             setImageProcessing(true);
-            console.log("child function start called");
+            console.log("----child function start called");
             let image = await SendGetImage("delta");
             setImageA(image);
 
@@ -149,43 +150,39 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
             await SendCollectMaxCap();
             await waitForTaskDone();
 
-            console.log("child function start done");
-            console.log("setImageProcessing true");
-        },
-        async update() {
-            console.log("child function update called");
-            //setCbcCurrent(Array(RxCount).fill(2.5));
-            console.log("child function update done");
+            console.log("----child function start done");
         },
         async apply() {
-            console.log("child function apply called");
+            console.log("----child function apply called");
             let data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeMax});
-            console.log("child function apply done", data);
+            console.log("----child function apply done", data);
         },
         async clear() {
-            console.log("child function clear called");
+            console.log("----child function clear called");
             let data = await SendClearMaxCap();
             console.log("child function clear done", data);
         },
         async cancel() {
-            console.log("child function cancel called");
+            console.log("----child function cancel called");
             let data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeRam });
-            console.log("child function cancel done", data);
+            console.log("----child function cancel done", data);
         },
         async accept() {
-            console.log("child function accept called");
+            console.log("----child function accept called");
             await SendTerminateMaxCap();
-            SendGetImage("delta")
-                .then((ret) => {
-                    setImageB(ret);
-                    dataReady.current = true;
-                    setImageProcessing(false);
-                })
-                .catch((err) => {
-                    dataReady.current = true;
-                    setImageProcessing(false);
-                });
-            console.log("child function accept called");
+            try {
+                let data = await SendGetImage("delta")
+                await setImageB(data);
+            }
+            catch (e) {
+                alert(e.toString());
+            }
+            finally {
+                dataReady.current = true;
+                setImageProcessing(false);
+                removeEvent();
+            }
+            console.log("----child function accept done");
         }
     }));
 

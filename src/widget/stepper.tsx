@@ -40,8 +40,8 @@ export const ContentStepper = (props: any): JSX.Element => {
     const tutorRef = useRef(null);
 
     const [controlState, setControlState] = useState(DEFAULT_CONTROL_STATE);
-    const controlStatePrevRef = useRef(DEFAULT_CONTROL_STATE);
-    const actionQueueRef = useRef<string[]>([]);
+    ////const controlStatePrevRef = useRef(DEFAULT_CONTROL_STATE);
+    ////const actionQueueRef = useRef<string[]>([]);
     const [initState, setInitState] = useState(false);
 
     function updateTutorRef(ref: any) {
@@ -65,6 +65,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     state={controlState}
                     updateRef={updateTutorRef}
                     updateInitState={updateInitState}
+                    onAction={onAction}
                 />
             )
         },
@@ -76,6 +77,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     state={controlState}
                     updateRef={updateTutorRef}
                     updateInitState={updateInitState}
+                    onAction={onAction}
                 />
             )
         }
@@ -142,6 +144,7 @@ export const ContentStepper = (props: any): JSX.Element => {
         );
     }
 
+    /*
     const myPromise = async (): Promise<string> => {
         console.log("myPromise start");
         try {
@@ -153,6 +156,7 @@ export const ContentStepper = (props: any): JSX.Element => {
             return Promise.reject("connect failed.");
         }
     };
+    */
 
     function onAction(action: string) {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
@@ -199,7 +203,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.clear = 1;
                     newState.accept = 1;
                 }
-                actionQueueRef.current.push("start");
+                tutorRef.current.start();
                 break;
             case "done":
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
@@ -212,12 +216,22 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.start = 0;
                     newState.done = 1;
                 }
-                ///////////////////qqqqqqqqq
                 break;
             case "terminate":
-                actionQueueRef.current.push("terminate");
+                if (controlState.step === 0) {
+                    newState.start = 1;
+                    newState.cancel = 0;
+                    newState.progress = 0;
+                }
+                tutorRef.current.terminate();
                 break;
             case "cancel":
+                if (controlState.step === 0) {
+                    newState.start = 1;
+                    newState.cancel = 0;
+                    newState.progress = 0;
+                }
+                tutorRef.current.cancel();
                 break;
         }
 
@@ -236,6 +250,7 @@ export const ContentStepper = (props: any): JSX.Element => {
         setControlState(newState);
     }
 
+    /*
     useEffect(() => {
         if (actionQueueRef.current[actionQueueRef.current.length - 1] === "start") {
             actionQueueRef.current.pop();
@@ -251,6 +266,7 @@ export const ContentStepper = (props: any): JSX.Element => {
         }
         controlStatePrevRef.current = controlState;
     }, [controlState]);
+    */
 
     function showStep() {
         return (

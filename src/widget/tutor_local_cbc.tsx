@@ -30,7 +30,8 @@ import {
     SendGetImage,
     SendRun,
     GetStaticConfig,
-    SendUpdateStaticConfig
+    SendUpdateStaticConfig,
+    SendTutorAction
 } from "./tutor_api";
 
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -50,9 +51,10 @@ interface IProps {
     state: any;
     updateRef: any;
     updateInitState: any;
+    onAction: any;
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+//const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const PROGRESS_WIDTH = 250;
 const PROGRESS_HEIGHT = 30;
@@ -85,6 +87,22 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
             }
         });
         return strValue;
+    }
+
+    function convertStringToCbc(cbc: any) {
+        let value = cbc.map((v, i) => {
+            if (v === 0) {
+                return 32;
+            }
+            else if (v > 0) {
+                return v * 2;
+            }
+            else {
+                return 0 - (v * 2) + 32;
+            }
+
+        });
+        return value;
     }
 
     async function GetLocalCBC(): Promise<number[]> {
@@ -129,24 +147,24 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     const eventRoute = "/webds/tutor/event";
 
     const eventHandler = (event: any) => {
-        console.log(event);
         const data = JSON.parse(event.data);
 
         if (data.state === "run") {
             setProgress(data.progress);
         }
         else if (data.state === "stop") {
-            setImageProcessing(false);
             setCbcCurrent(convertCbcToString(data.data));
             SendGetImage("baseline")
                 .then((ret) => {
                     setImageB(ret);
                     dataReady.current = true;
                     setImageProcessing(false);
+                    props.onAction("progress");
                 })
                 .catch((err) => {
                     dataReady.current = true;
                     setImageProcessing(false);
+                    props.onAction("done");
                 });
         }
     };
@@ -184,10 +202,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     };
 
     useEffect(() => {
-        console.log("Progress:", progress);
-    }, [progress]);
-
-    useEffect(() => {
         console.log("TUTOR LOCAL CBC INIT");
         props.updateRef(this);
 
@@ -221,38 +235,37 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
             });
     }
 
-    async function waitForTaskDone() {
-        while (dataReady.current === false) {
-            await delay(100);
-        }
-    }
-
     useImperativeHandle(ref, () => ({
         async start() {
+            console.log("child function start called");
             setProgress(0);
             setImageProcessing(true);
             dataReady.current = false;
             try {
-                console.log("child function start called");
                 let image = await SendGetImage("baseline");
                 setImageA(image);
-
                 addEvent();
                 await SendCollectCBC();
-                ////// qmaoTestSSE();
-                await waitForTaskDone();
             } catch (err) {
                 alert(err);
             }
             console.log("child function start done");
         },
-
-        async update() {
-            console.log("child function update called");
-
-            console.log("child function update done");
+        async terminate() {
+            removeEvent();
+            try {
+                await SendTutorAction("LocalCBC", "terminate", {});
+            }
+            catch (e) {
+                alert(e.toString());
+            }
+            dataReady.current = true;
         },
-
+        async cancel() {
+            console.log("----child function cancel called");
+            let data = await SendUpdateStaticConfig({ imageCBCs: convertStringToCbc(cbcPrev) });
+            console.log("----child function cancel done", data);
+        },
         async apply() {
             console.log("child function apply called");
             let data = cbcCurrent.map((value) => {
@@ -275,7 +288,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     function showImage(image: any, title: any) {
         return (
             <Stack alignItems="center" justifyContent="center">
-                <Typography sx={{}}>{title}</Typography>
+                <Typography>{title}</Typography>
                 <Heatmap image={image} width={300} />
             </Stack>
         );
@@ -283,6 +296,8 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
 
     function showImages() {
         if (!imageProcessing) {
+            console.log("A", imageA);
+            console.log("B", imageB);
             return (
                 <Stack
                     spacing={5}
@@ -535,6 +550,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                 width: (progress * PROGRESS_WIDTH) / 100,
                                 height: PROGRESS_HEIGHT,
                                 borderRadius: 1,
+                                borser: 1,
                                 ml: "1px"
                             }}
                         />
@@ -555,12 +571,11 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                             {progress.toFixed(1) + " %"}
                         </Typography>
                     </Box>
-                    <Stack
+                    <Paper
                         id="outlined-size-small"
                         sx={{
                             width: PROGRESS_WIDTH,
                             height: PROGRESS_HEIGHT,
-                            border: 1,
                             borderRadius: 1
                         }}
                     />
