@@ -16,6 +16,7 @@ import {
 
 import { SendGetImage, SendUpdateStaticConfig, SendRun, SendTutorAction, GetStaticConfig } from "./tutor_api";
 import { Heatmap } from "./widget_heatmap";
+import { WidgetAttributes } from "./widget_constant";
 
 export const AttributesMaxCapacitance = {
     title: "Max Capacitance",
@@ -27,6 +28,9 @@ export const AttributesMaxCapacitance = {
     When ready, click "Collect Signal" button.`,
         `Move the object slowly to capture the maximum pixel value.`,
         `To accept the result, click the "Accept" button.`
+    ],
+    descriptionApply: [
+        `Compare delta images. Press "Cancel" button to recolloect nax capacitance, or press "Apply" button to apply tuning result.`
     ]
 };
 
@@ -253,7 +257,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
         return (
             <Stack alignItems="center" justifyContent="center">
                 <Typography sx={{}}>{title}</Typography>
-                <Heatmap image={image} width={300} />
+                <Heatmap image={image} width={WidgetAttributes.HeatmapImageHeight} />
             </Stack>
         );
     }
@@ -264,7 +268,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                 <Stack
                     spacing={5}
                     direction="row"
-                    sx={{ width: "100%" }}
+                    sx={{ width: "100%", pt: 3}}
                     alignItems="center"
                     justifyContent="center"
                 >
@@ -277,24 +281,48 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
         }
     }
 
-    function TutorContentApply(): JSX.Element {
-        return <>{showImages()}</>;
-    }
-
     function TutorContent(): JSX.Element {
         return (
             <Stack direction="column" spacing={3}>
-                <Paper elevation={0}>
-                    <Stack direction="column" spacing={2}>
-                        {showTextField("Max Signal", signalMax)}
-                        {showTextField("Cumulative Max Signal", signalCumulativeMax)}
-                        {showTextField("Saturation Level", signalCumulativeRam.toString(), "", "2D ADC")}
-                    </Stack>
-                </Paper>
+                {props.state.apply === 0 && (
+                    <Paper elevation={0}>
+                        <Stack direction="column" spacing={2}>
+                            {showTextField("Max Signal", signalMax)}
+                            {showTextField("Cumulative Max Signal", signalCumulativeMax)}
+                            {showTextField("Saturation Level", signalCumulativeRam.toString(), "", "2D ADC")}
+                        </Stack>
+                    </Paper>
+                )}
                 {props.state.apply === 1 && (
-                    <Stack sx={{ px: 2 }}>{TutorContentApply()}</Stack>
+                    <Stack sx={{ px: 2 }}>{showImages()}</Stack>
                 )}
             </Stack>
+        );
+    }
+
+    function showDescription() {
+        let description;
+        if (props.state.apply === 0) {
+            description = AttributesMaxCapacitance.description;
+        } else {
+            description = AttributesMaxCapacitance.descriptionApply;
+        }
+        return (
+            <>
+                {description.map((value) => {
+                    return (
+                        <Typography
+                            variant="subtitle2"
+                            gutterBottom
+                            key={`Typography-max-cap-des-${value}`}
+                            sx={{ fontSize: 12 }}
+                            style={{ whiteSpace: 'normal' }}
+                        >
+                            {value}
+                        </Typography>
+                    );
+                })}
+            </>
         );
     }
 
@@ -302,18 +330,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
         <Stack spacing={2}>
             <Stack direction="row" alignItems="flex-start" spacing={3} sx={{ m: 1 }}>
                 <Stack direction="column">
-                    {AttributesMaxCapacitance.description.map((value) => {
-                        return (
-                            <Typography
-                                variant="subtitle2"
-                                gutterBottom
-                                key={`Typography-MaxCapacitance-des-${value}`}
-                                sx={{ fontSize: 12 }}
-                            >
-                                {value}
-                            </Typography>
-                        );
-                    })}
+                    {showDescription()}
                 </Stack>
             </Stack>
             <Divider />

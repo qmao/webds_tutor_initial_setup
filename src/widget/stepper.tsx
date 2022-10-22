@@ -16,7 +16,7 @@ import {
     AttributesMaxCapacitance
 } from "./tutor_max_capacitance";
 
-import { Attributes } from "./constant";
+import { WidgetAttributes } from "./widget_constant";
 import WidgetControl from "./widget_control";
 
 const TEXT_WIDTH_CONNECT = 250;
@@ -292,8 +292,8 @@ export const ContentStepper = (props: any): JSX.Element => {
                 <Paper
                     elevation={0}
                     sx={{
-                        width: Attributes.ui.interactiveContentWidth,
-                        minHeight: Attributes.ui.stepContentHeight
+                        width: WidgetAttributes.interactiveContentWidth,
+                        minHeight: WidgetAttributes.stepContentHeight
                     }}
                 >
                     <Stack>

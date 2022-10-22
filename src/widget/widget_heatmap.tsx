@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { Stack, Typography, Box } from "@mui/material";
-import { colorTable } from "./constant";
+import { ColorTable } from "./widget_constant";
 
 interface IProps {
     image: any;
@@ -81,19 +81,19 @@ export const Heatmap = (props: IProps): JSX.Element => {
         //value = value / PeakMax.current;
         if (value > 1) value = 1;
         else if (value < 0) value = 0;
-        return Math.round(value * (colorTable.length - 1));
+        return Math.round(value * (ColorTable.length - 1));
     }
 
     function red(value: number): number {
-        return colorTable[value][0];
+        return ColorTable[value][0];
     }
 
     function green(value: number): number {
-        return colorTable[value][1];
+        return ColorTable[value][1];
     }
 
     function blue(value: number): number {
-        return colorTable[value][2];
+        return ColorTable[value][2];
     }
 
     function componentToHex(c) {

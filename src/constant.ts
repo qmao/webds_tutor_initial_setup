@@ -8,10 +8,5 @@ export const Attributes = {
   "caption": "Initial Setup",
   "category": "Touch - Config Library",
   "rank": 30,
-  "icon": extensionTutorInitialSetupIcon,
-  ui: {
-    stepContentHeight: 440,
-    interactiveContentWidth: 732,
-    interactiveImageHeight: 300
-  }
+  "icon": extensionTutorInitialSetupIcon
 }

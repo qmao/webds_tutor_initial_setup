@@ -36,6 +36,7 @@ import {
 
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Heatmap } from "./widget_heatmap";
+import { WidgetAttributes } from "./widget_constant";
 
 export const AttributesLocalCBC = {
     title: "Calculate Local CBC",
@@ -302,7 +303,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                 <Stack
                     spacing={5}
                     direction="row"
-                    sx={{ width: "100%" }}
+                    sx={{ width: "100%", pt: 3 }}
                     alignItems="center"
                     justifyContent="center"
                 >
@@ -456,6 +457,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                             gutterBottom
                             key={`Typography-CBC-des-${value}`}
                             sx={{ fontSize: 12 }}
+                            style={{ whiteSpace: 'normal' }}
                         >
                             {value}
                         </Typography>
@@ -528,7 +530,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                 direction="row"
                 justifyContent="center"
                 alignItems="center"
-                sx={{ minHeight: 300 }}
+                sx={{ minHeight: WidgetAttributes.HeatmapImageHeight }}
                 spacing={2}
             >
                 <Box sx={{ position: "relative", display: "inline-flex", mr: 1 }}>

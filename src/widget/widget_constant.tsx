@@ -1,22 +1,13 @@
 //import { extensionConnectionIcon } from "./icons";
 
-export const Attributes = {
-    plugin: "@webds/connection:plugin",
-    command: "webds_connection:open",
-    id: "webds_connection_widget",
-    label: "Connection",
-    caption: "Connection",
-    category: "DSDK - Applications",
-    rank: 30,
-    //icon: extensionConnectionIcon,
-    ui: {
-        stepContentHeight: 440,
-        interactiveContentWidth: 732,
-        interactiveImageHeight: 300
-    }
+export const WidgetAttributes = {
+    HeatmapImageHeight: 300,
+    stepContentHeight: 440,
+    interactiveContentWidth: 732,
+    interactiveImageHeight: 300
 };
 
-export const colorTable = [
+export const ColorTable = [
     [0.267004, 0.004874, 0.329415],
     [0.26851, 0.009605, 0.335427],
     [0.269944, 0.014625, 0.341379],
