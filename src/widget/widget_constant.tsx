@@ -4,7 +4,8 @@ export const WidgetAttributes = {
     HeatmapImageHeight: 300,
     stepContentHeight: 440,
     interactiveContentWidth: 732,
-    interactiveImageHeight: 300
+    interactiveImageHeight: 300,
+    rootWidgetHeight: 1020
 };
 
 export const ColorTable = [

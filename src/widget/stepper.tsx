@@ -37,16 +37,13 @@ const DEFAULT_CONTROL_STATE = {
     progress: 0,
     toflash: 0,
     clear: 0,
-    accept: 0,
-    onInit: 0
+    accept: 0
 };
 
 export const ContentStepper = (props: any): JSX.Element => {
     const tutorRef = useRef(null);
 
     const [controlState, setControlState] = useState(DEFAULT_CONTROL_STATE);
-    ////const controlStatePrevRef = useRef(DEFAULT_CONTROL_STATE);
-    ////const actionQueueRef = useRef<string[]>([]);
     const [initState, setInitState] = useState(false);
     const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
 
@@ -56,10 +53,7 @@ export const ContentStepper = (props: any): JSX.Element => {
 
     function updateInitState(state: any) {
         console.log("STEP updateInitState:", state);
-        setInitState(state);
-        let newState = JSON.parse(JSON.stringify(controlStateRef.current));
-        newState.onInit = !state;
-        setControlState(newState);
+        setInitState(!state);
     }
 
     const steps = [
@@ -102,10 +96,7 @@ export const ContentStepper = (props: any): JSX.Element => {
     ];
 
     useEffect(() => {
-        const index = steps
-            .map((object) => object.label)
-            .indexOf(AttributesMaxCapacitance.title);
-        console.log("INDEX:", index);
+
     }, []);
 
     function showStepTitle(step, index) {
@@ -162,10 +153,10 @@ export const ContentStepper = (props: any): JSX.Element => {
         );
     }
 
-    function onAction(action: string) {
+    async function onAction(action: string) {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
-        console.log(action);
+        console.log("QQQQQQQQQQQQQQQ:", action, controlState.step);
         switch (action) {
             case "progress":
                 if (controlState.step === 0) {
@@ -187,14 +178,14 @@ export const ContentStepper = (props: any): JSX.Element => {
                 break;
             case "clear":
                 newState = JSON.parse(JSON.stringify(controlState));
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 break;
             case "accept":
                 newState.progress = 0;
                 newState.apply = 1;
                 newState.cancel = 1;
                 newState.start = 0;
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 break;
             case "start":
                 if (controlState.step === 0) {
@@ -207,15 +198,16 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.clear = 1;
                     newState.accept = 1;
                 }
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 break;
             case "toflash":
-                tutorRef.current.action(action);
+                console.log("QQQQQQQQQQQQQ CURRENT:", tutorRef.current);
+                console.log("QQQQQQQQQQQQQ action POS:", tutorRef.current);
+                await tutorRef.current.action(action);
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
-                tutorRef.current.action(action);
                 break;
             case "apply":
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 if (controlState.step !== STEP_COUNT_MAX) {
                     newState.step = controlState.step + 1;
                 }
@@ -226,7 +218,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.cancel = 0;
                     newState.progress = 0;
                 }
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 break;
             case "cancel":
                 if (controlState.step === 0) {
@@ -237,7 +229,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                 if (controlState.step === 2) {
                     newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
                 }
-                tutorRef.current.action(action);
+                await tutorRef.current.action(action);
                 break;
         }
 
@@ -299,7 +291,7 @@ export const ContentStepper = (props: any): JSX.Element => {
 
     function showFeedback() {
         return (
-            <Box sx={{ position: "relative", display: "inline-flex", mr: 1 }}>
+            <Box sx={{ position: "relative", display: "inline-flex"}}>
                 <Paper
                     elevation={0}
                     sx={{
@@ -310,7 +302,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     <Stack>
                         <Typography>{steps[controlState.step].description}</Typography>
                     </Stack>
-                    {!initState && (
+                    {initState && (
                         <Box
                             sx={{
                                 top: 0,
@@ -356,7 +348,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     </Box>
                 )}
             </Paper>
-            <WidgetControl state={controlState} onAction={onAction} />
+            <WidgetControl state={controlState} onAction={onAction} isInitProcess={initState}/>
         </Stack>
     );
 };

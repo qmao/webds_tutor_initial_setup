@@ -580,7 +580,8 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                         sx={{
                             width: PROGRESS_WIDTH,
                             height: PROGRESS_HEIGHT,
-                            borderRadius: 1
+                            borderRadius: 1,
+                            border: 1
                         }}
                     />
                 </Box>

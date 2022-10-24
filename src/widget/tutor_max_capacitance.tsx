@@ -43,14 +43,12 @@ interface IProps {
     onAction: any;
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     const [signalMax, setSignalMax] = React.useState("");
     const [signalCumulativeMax, setSignalCumulativeMax] = React.useState("");
     const [signalCumulativeRam, setSignalCumulativeRam] = React.useState(0);
 
-    const [imageProcessing, setImageProcessing] = React.useState(false);
+    const [imageReady, setImageReady] = React.useState(false);
     const [imageA, setImageA] = React.useState([]);
     const [imageB, setImageB] = React.useState([]);
 
@@ -119,13 +117,13 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     }
 
     async function SendTerminateMaxCap() {
-        SendTutorAction("MaxCapacitance", "terminate", {})
-            .then((ret) => {
-                console.log(ret);
-            })
-            .catch((err) => {
-                alert(err);
-            });
+        try {
+            let ret = await SendTutorAction("MaxCapacitance", "terminate", {})
+            console.log(ret);
+        }
+        catch (e) {
+            alert(e);
+        }
     }
 
     async function SendCollectMaxCap() {
@@ -138,26 +136,18 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
             });
     }
 
-    async function waitForTaskDone() {
-        while (dataReady.current === false) {
-            await delay(100);
-        }
-    }
-
     useImperativeHandle(ref, () => ({
         async action(action: any) {
             let data;
             switch (action) {
                 case "start":
                     props.updateInitState(false);
-                    setImageProcessing(true);
                     let image = await SendGetImage("delta");
                     setImageA(image);
 
                     addEvent();
                     props.updateInitState(true);
                     await SendCollectMaxCap();
-                    await waitForTaskDone();
                     break;
                 case "apply":
                     props.updateInitState(false);
@@ -170,6 +160,8 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     console.log(data);
                     break;
                 case "cancel":
+                    setSignalCumulativeMax("");
+                    setSignalMax("");
                     data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeRam });
                     console.log(data);
                     break;
@@ -186,7 +178,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     }
                     finally {
                         dataReady.current = true;
-                        setImageProcessing(false);
+                        setImageReady(true);
                         props.updateInitState(true);
                     }
                     break;
@@ -210,6 +202,9 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
         console.log("TUTOR MAX CAP INIT");
         props.updateRef(this);
         props.updateInitState(false);
+        setImageReady(false);
+        setSignalCumulativeMax("");
+        setSignalMax("");
 
         GetMaxCapFromStaticConfig().then((data) => {
             props.updateInitState(true);
@@ -269,7 +264,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     }
 
     function showImages() {
-        if (!imageProcessing) {
+        if (imageReady) {
             return (
                 <Stack
                     spacing={5}
@@ -309,7 +304,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     function showDescription() {
         let description;
         if (props.state.apply === 0) {
-            if (eventSource) {
+            if (eventSource.current) {
                 description = AttributesMaxCapacitance.descriptionProgress;
             }
             else {
@@ -319,7 +314,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
             description = AttributesMaxCapacitance.descriptionApply;
         }
         return (
-            <>
+            <Stack sx={{minHeight: 100}}>
                 {description.map((value) => {
                     return (
                         <Typography
@@ -333,7 +328,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                         </Typography>
                     );
                 })}
-            </>
+            </Stack>
         );
     }
 

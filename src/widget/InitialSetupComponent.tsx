@@ -7,9 +7,8 @@ import { ContentStepper } from "./stepper";
 import { ThemeProvider } from "@mui/material/styles";
 
 import { WebDSService } from "@webds/service";
-////import { getWebDSTheme } from "./ui/mui_theme";
+import { WidgetAttributes } from "./widget_constant";
 
-const WIDGET_WIDTH = 1000;
 const HEIGHT_TITLE = 70;
 const HEIGHT_CONTENT_MIN = 300;
 const EXTENSION_TITLE = "Initial Setup";
@@ -30,7 +29,7 @@ export default function InitialSetupComponent(props: IProps) {
                 <Paper
                     elevation={0}
                     sx={{
-                        minWidth: WIDGET_WIDTH + "px",
+                        width: WidgetAttributes.rootWidgetHeight + "px",
                         height: HEIGHT_TITLE + "px",
                         position: "relative",
                         bgcolor: "section.main"
@@ -53,7 +52,7 @@ export default function InitialSetupComponent(props: IProps) {
                     direction="row"
                     alignItems="stretch"
                     sx={{
-                        minWidth: WIDGET_WIDTH + "px",
+                        width: WidgetAttributes.rootWidgetHeight + "px",
                         minHeight: HEIGHT_CONTENT_MIN + "px",
                         bgcolor: "section.main"
                     }}

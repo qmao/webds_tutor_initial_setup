@@ -32,26 +32,22 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
         stateRef.current = props.state;
     }, [props.state]);
 
-   
     useImperativeHandle(ref, () => ({
         async action(action: any) {
-            try {
-                switch (action) {
-                    case "toflash":
-                        await SendWriteToFlash();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (e) {
-                alert(e.toString());
+            switch (action) {
+                case "toflash":
+                    props.updateInitState(false);
+                    props.updateInitState(true);
+                    await SendWriteToFlash();
+                    break;
+                default:
+                    break;
             }
         }
     }));
 
     useEffect(() => {
-        console.log("TUTOR FINISH INIT");
+        console.log("TUTOR FINISH INIT", this);
         props.updateRef(this);
         props.updateInitState(true);
     }, []);
