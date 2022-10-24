@@ -7,19 +7,14 @@ import React, {
 
 import {
     Typography,
-    Stack,
-    Divider,
-    Paper,
+    Stack
 } from "@mui/material";
 
 import { SendWriteToFlash } from "./tutor_api";
 
 export const AttributesFinish = {
     title: "Finish Tuning",
-    description: [
-        `Write To Flash -> All changes will be permanent and will be used even after the sensor firmware restart.`,
-        `Cancel         -> All changes will be applied to the RAM and will be reset to default after the sensor firmware restart`
-    ]
+    description: []
 };
 
 interface IProps {
@@ -61,36 +56,33 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
         props.updateInitState(true);
     }, []);
 
-    function TutorContent(): JSX.Element {
-        return (
-            <Stack direction="column" spacing={3}>
-                {props.state.apply === 0 && (
-                    <Paper elevation={0}>
-                        <Stack direction="column" spacing={2}>
-                        </Stack>
-                    </Paper>
-                )}
-            </Stack>
-        );
-    }
-
     function showDescription() {
-        let description = AttributesFinish.description;
         return (
             <>
-                {description.map((value) => {
-                    return (
-                        <Typography
-                            variant="subtitle2"
-                            gutterBottom
-                            key={`Typography-max-cap-des-${value}`}
-                            sx={{ fontSize: 12 }}
-                            style={{ whiteSpace: 'normal' }}
-                        >
-                            {value}
-                        </Typography>
-                    );
-                })}
+                <Typography variant="caption" display="block" sx={{ fontWeight: 'bold'}}>
+                    Write To FLASH
+                </Typography>
+                <Typography
+                    variant="caption"
+                    display="block"
+                    gutterBottom
+                    sx={{ pl: 2 }}
+                >
+                    All changes will be permanent and will be used even after the sensor
+                    firmware restart.
+                </Typography>
+                <Typography variant="caption" display="block" sx={{ fontWeight: 'bold' }}>
+                    Cancel
+                </Typography>
+                <Typography
+                    variant="caption"
+                    display="block"
+                    gutterBottom
+                    sx={{ pl: 2 }}
+                >
+                    All changes will be applied to the RAM and will be reset to default
+                    after the sensor firmware restart
+                </Typography>
             </>
         );
     }
@@ -98,12 +90,10 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
     return (
         <Stack spacing={2}>
             <Stack direction="row" alignItems="flex-start" spacing={3} sx={{ m: 1 }}>
-                <Stack direction="column">
+                <Stack direction="column" sx={{mt: 5, ml: 1}}>
                     {showDescription()}
                 </Stack>
             </Stack>
-            <Divider />
-            <Stack sx={{ px: 2 }}>{TutorContent()}</Stack>
         </Stack>
     );
 });

@@ -84,10 +84,10 @@ export default function WidgetControl(props: IProps): JSX.Element {
                         addActionButtion(props.state.cancel, "cancel", "Cancel")}
                     {props.state.progress === 1 &&
                         addActionButtion(props.state.cancel, "terminate", "Cancel")}
-                    {addActionButtion(props.state.apply, "apply", "Apply")}
+                    {addActionButtion(props.state.apply, "apply", "Write To RAM")}
                     {addActionButtion(props.state.clear, "clear", "Clear")}
                     {addActionButtion(props.state.accept, "accept", "Accept")}
-                    {addActionButtion(props.state.toflash, "toflash", "Write To Flash")}
+                    {addActionButtion(props.state.toflash, "toflash", "Write To FLASH")}
                 </Stack>
                 <Button
                     size="small"

@@ -22,12 +22,14 @@ export const AttributesMaxCapacitance = {
     title: "Max Capacitance",
     description: [
         `Place a conductive object that is at least three pixels in diameter on the sensor.`,
-        `
-    Make sure the object is well grounded (connected by a metal wire to a ground pin on the board or to the grounded metal sheath of an exposed USB cable connected to the system).`,
-        `
-    When ready, click "Collect Signal" button.`,
+        `Make sure the object is well grounded (connected by a metal wire to a ground pin on the board or to the grounded metal sheath of an exposed USB cable connected to the system).`,
+        `When ready, click "Start" button.`
+    ],
+    descriptionProgress: [
         `Move the object slowly to capture the maximum pixel value.`,
-        `To accept the result, click the "Accept" button.`
+        `Click the "Clear" button to re-collect data.`,
+        `Click the "Accept" button to accept the result.`,
+        ``
     ],
     descriptionApply: [
         `Compare delta images. Press "Cancel" button to recolloect nax capacitance, or press "Apply" button to apply tuning result.`
@@ -147,17 +149,21 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
             let data;
             switch (action) {
                 case "start":
+                    props.updateInitState(false);
                     setImageProcessing(true);
                     let image = await SendGetImage("delta");
                     setImageA(image);
 
                     addEvent();
+                    props.updateInitState(true);
                     await SendCollectMaxCap();
                     await waitForTaskDone();
                     break;
                 case "apply":
+                    props.updateInitState(false);
                     data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeMax });
                     console.log(data);
+                    props.updateInitState(true);
                     break;
                 case "clear":
                     data = await SendClearMaxCap();
@@ -168,6 +174,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     console.log(data);
                     break;
                 case "accept":
+                    props.updateInitState(false);
                     removeEvent();
                     await SendTerminateMaxCap();
                     try {
@@ -180,6 +187,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     finally {
                         dataReady.current = true;
                         setImageProcessing(false);
+                        props.updateInitState(true);
                     }
                     break;
                 default:
@@ -301,7 +309,12 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     function showDescription() {
         let description;
         if (props.state.apply === 0) {
-            description = AttributesMaxCapacitance.description;
+            if (eventSource) {
+                description = AttributesMaxCapacitance.descriptionProgress;
+            }
+            else {
+                description = AttributesMaxCapacitance.description;
+            }
         } else {
             description = AttributesMaxCapacitance.descriptionApply;
         }

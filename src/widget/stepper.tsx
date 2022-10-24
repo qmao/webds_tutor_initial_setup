@@ -48,6 +48,7 @@ export const ContentStepper = (props: any): JSX.Element => {
     ////const controlStatePrevRef = useRef(DEFAULT_CONTROL_STATE);
     ////const actionQueueRef = useRef<string[]>([]);
     const [initState, setInitState] = useState(false);
+    const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
 
     function updateTutorRef(ref: any) {
         tutorRef.current = ref;
@@ -56,7 +57,7 @@ export const ContentStepper = (props: any): JSX.Element => {
     function updateInitState(state: any) {
         console.log("STEP updateInitState:", state);
         setInitState(state);
-        let newState = JSON.parse(JSON.stringify(controlState));
+        let newState = JSON.parse(JSON.stringify(controlStateRef.current));
         newState.onInit = !state;
         setControlState(newState);
     }
@@ -257,6 +258,7 @@ export const ContentStepper = (props: any): JSX.Element => {
 
         console.log(newState);
         setControlState(newState);
+        controlStateRef.current = newState;
     }
 
     /*
