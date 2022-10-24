@@ -161,20 +161,6 @@ export const ContentStepper = (props: any): JSX.Element => {
         );
     }
 
-    /*
-    const myPromise = async (): Promise<string> => {
-        console.log("myPromise start");
-        try {
-            await tutorRef.current.start();
-            return Promise.resolve(JSON.stringify("test"));
-        }
-        catch (e) {
-            alert(e);
-            return Promise.reject("connect failed.");
-        }
-    };
-    */
-
     function onAction(action: string) {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
@@ -225,6 +211,7 @@ export const ContentStepper = (props: any): JSX.Element => {
             case "toflash":
                 tutorRef.current.action(action);
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
+                tutorRef.current.action(action);
                 break;
             case "apply":
                 tutorRef.current.action(action);

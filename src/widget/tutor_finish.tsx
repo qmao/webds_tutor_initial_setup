@@ -12,6 +12,7 @@ import {
     Paper,
 } from "@mui/material";
 
+import { SendWriteToFlash } from "./tutor_api";
 
 export const AttributesFinish = {
     title: "Finish Tuning",
@@ -39,11 +40,17 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
    
     useImperativeHandle(ref, () => ({
         async action(action: any) {
-            switch (action) {
-                case "toflash":
-                    break;
-                default:
-                    break;
+            try {
+                switch (action) {
+                    case "toflash":
+                        await SendWriteToFlash();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (e) {
+                alert(e.toString());
             }
         }
     }));

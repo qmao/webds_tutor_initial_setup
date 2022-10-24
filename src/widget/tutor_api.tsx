@@ -13,6 +13,23 @@ export async function SendUpdateStaticConfig(dataToSend): Promise<string> {
     }
 }
 
+export async function SendWriteToFlash(): Promise<string | undefined> {
+    try {
+        var dataToSend = {
+            command: "commitConfig"
+        };
+        const reply = await requestAPI<any>("command", {
+            body: JSON.stringify(dataToSend),
+            method: "POST"
+        });
+
+        return Promise.resolve(JSON.stringify(reply));
+    } catch (e) {
+        console.error(`Error on POST ${dataToSend}.\n${e}`);
+        return Promise.reject((e as Error).message);
+    }
+};
+
 export async function SendTutorAction(module: any, action: any, settings: any): Promise<string> {
     const dataToSend = {
         task: action,
