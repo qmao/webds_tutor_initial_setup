@@ -237,52 +237,53 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     }
 
     useImperativeHandle(ref, () => ({
-        async start() {
-            console.log("child function start called");
-            setProgress(0);
-            setImageProcessing(true);
-            dataReady.current = false;
-            try {
-                let image = await SendGetImage("baseline");
-                setImageA(image);
-                addEvent();
-                await SendCollectCBC();
-            } catch (err) {
-                alert(err);
+        async action(action: any) {
+            let data;
+            switch (action) {
+                case "start":
+                    setProgress(0);
+                    setImageProcessing(true);
+                    dataReady.current = false;
+                    try {
+                        let image = await SendGetImage("baseline");
+                        setImageA(image);
+                        addEvent();
+                        await SendCollectCBC();
+                    } catch (err) {
+                        alert(err);
+                    }
+                    break;
+                case "terminate":
+                    removeEvent();
+                    try {
+                        await SendTutorAction("LocalCBC", "terminate", {});
+                    }
+                    catch (e) {
+                        alert(e.toString());
+                    }
+                    dataReady.current = true;
+                    break;
+                case "cancel":
+                    data = await SendUpdateStaticConfig({ imageCBCs: convertStringToCbc(cbcPrev) });
+                    console.log(data);
+                    break;
+                case "apply":
+                    data = cbcCurrent.map((value) => {
+                        let num = Number(value);
+                        if (num === 0) {
+                            return 0;
+                        }
+                        if (num > 0) {
+                            return num * 2;
+                        } else {
+                            num = Math.abs(num) * 2 + 32;
+                            return num;
+                        }
+                    });
+                    await SendUpdateStaticConfig({ imageCBCs: data });
+                    break;
             }
-            console.log("child function start done");
-        },
-        async terminate() {
-            removeEvent();
-            try {
-                await SendTutorAction("LocalCBC", "terminate", {});
-            }
-            catch (e) {
-                alert(e.toString());
-            }
-            dataReady.current = true;
-        },
-        async cancel() {
-            console.log("----child function cancel called");
-            let data = await SendUpdateStaticConfig({ imageCBCs: convertStringToCbc(cbcPrev) });
-            console.log("----child function cancel done", data);
-        },
-        async apply() {
-            console.log("child function apply called");
-            let data = cbcCurrent.map((value) => {
-                let num = Number(value);
-                if (num === 0) {
-                    return 0;
-                }
-                if (num > 0) {
-                    return num * 2;
-                } else {
-                    num = Math.abs(num) * 2 + 32;
-                    return num;
-                }
-            });
-            await SendUpdateStaticConfig({ imageCBCs: data });
-            console.log("child function apply done");
+
         }
     }));
 
@@ -574,6 +575,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                         </Typography>
                     </Box>
                     <Paper
+                        elevation={2}
                         id="outlined-size-small"
                         sx={{
                             width: PROGRESS_WIDTH,

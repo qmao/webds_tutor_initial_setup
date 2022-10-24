@@ -71,7 +71,6 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     const eventRoute = "/webds/tutor/event";
 
     const eventHandler = (event: any) => {
-        console.log(event);
         const data = JSON.parse(event.data);
 
         if (data.state === "run") {
@@ -144,49 +143,48 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
     }
 
     useImperativeHandle(ref, () => ({
-        async start() {
-            setImageProcessing(true);
-            console.log("----child function start called");
-            let image = await SendGetImage("delta");
-            setImageA(image);
+        async action(action: any) {
+            let data;
+            switch (action) {
+                case "start":
+                    setImageProcessing(true);
+                    let image = await SendGetImage("delta");
+                    setImageA(image);
 
-            addEvent();
-            await SendCollectMaxCap();
-            await waitForTaskDone();
-
-            console.log("----child function start done");
-        },
-        async apply() {
-            console.log("----child function apply called");
-            let data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeMax});
-            console.log("----child function apply done", data);
-        },
-        async clear() {
-            console.log("----child function clear called");
-            let data = await SendClearMaxCap();
-            console.log("child function clear done", data);
-        },
-        async cancel() {
-            console.log("----child function cancel called");
-            let data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeRam });
-            console.log("----child function cancel done", data);
-        },
-        async accept() {
-            console.log("----child function accept called");
-            await SendTerminateMaxCap();
-            try {
-                let data = await SendGetImage("delta")
-                await setImageB(data);
+                    addEvent();
+                    await SendCollectMaxCap();
+                    await waitForTaskDone();
+                    break;
+                case "apply":
+                    data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeMax });
+                    console.log(data);
+                    break;
+                case "clear":
+                    data = await SendClearMaxCap();
+                    console.log(data);
+                    break;
+                case "cancel":
+                    data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeRam });
+                    console.log(data);
+                    break;
+                case "accept":
+                    removeEvent();
+                    await SendTerminateMaxCap();
+                    try {
+                        let data = await SendGetImage("delta")
+                        await setImageB(data);
+                    }
+                    catch (e) {
+                        alert(e.toString());
+                    }
+                    finally {
+                        dataReady.current = true;
+                        setImageProcessing(false);
+                    }
+                    break;
+                default:
+                    break;
             }
-            catch (e) {
-                alert(e.toString());
-            }
-            finally {
-                dataReady.current = true;
-                setImageProcessing(false);
-                removeEvent();
-            }
-            console.log("----child function accept done");
         }
     }));
 

@@ -16,12 +16,17 @@ import {
     AttributesMaxCapacitance
 } from "./tutor_max_capacitance";
 
+import {
+    TutorFinish,
+    AttributesFinish
+} from "./tutor_finish";
+
 import { WidgetAttributes } from "./widget_constant";
 import WidgetControl from "./widget_control";
 
 const TEXT_WIDTH_CONNECT = 250;
 const STEP_LENGTH = 30;
-const STEP_COUNT_MAX = 1;
+const STEP_COUNT_MAX = 2;
 const DEFAULT_CONTROL_STATE = {
     next: 1,
     back: 0,
@@ -30,7 +35,7 @@ const DEFAULT_CONTROL_STATE = {
     cancel: 0,
     step: 0,
     progress: 0,
-    done: 0,
+    toflash: 0,
     clear: 0,
     accept: 0,
     onInit: 0
@@ -73,6 +78,18 @@ export const ContentStepper = (props: any): JSX.Element => {
             label: AttributesMaxCapacitance.title,
             description: (
                 <TutorMaxCapacitance
+                    ref={tutorRef}
+                    state={controlState}
+                    updateRef={updateTutorRef}
+                    updateInitState={updateInitState}
+                    onAction={onAction}
+                />
+            )
+        },
+        {
+            label: AttributesFinish.title,
+            description: (
+                <TutorFinish
                     ref={tutorRef}
                     state={controlState}
                     updateRef={updateTutorRef}
@@ -183,14 +200,14 @@ export const ContentStepper = (props: any): JSX.Element => {
                 break;
             case "clear":
                 newState = JSON.parse(JSON.stringify(controlState));
-                tutorRef.current.clear();
+                tutorRef.current.action(action);
                 break;
             case "accept":
                 newState.progress = 0;
                 newState.apply = 1;
                 newState.cancel = 1;
                 newState.start = 0;
-                tutorRef.current.accept();
+                tutorRef.current.action(action);
                 break;
             case "start":
                 if (controlState.step === 0) {
@@ -203,18 +220,16 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.clear = 1;
                     newState.accept = 1;
                 }
-                tutorRef.current.start();
+                tutorRef.current.action(action);
                 break;
-            case "done":
+            case "toflash":
+                tutorRef.current.action(action);
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
                 break;
             case "apply":
-                tutorRef.current.apply();
+                tutorRef.current.action(action);
                 if (controlState.step !== STEP_COUNT_MAX) {
                     newState.step = controlState.step + 1;
-                } else {
-                    newState.start = 0;
-                    newState.done = 1;
                 }
                 break;
             case "terminate":
@@ -223,7 +238,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.cancel = 0;
                     newState.progress = 0;
                 }
-                tutorRef.current.terminate();
+                tutorRef.current.action(action);
                 break;
             case "cancel":
                 if (controlState.step === 0) {
@@ -231,7 +246,10 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.cancel = 0;
                     newState.progress = 0;
                 }
-                tutorRef.current.cancel();
+                if (controlState.step === 2) {
+                    newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
+                }
+                tutorRef.current.action(action);
                 break;
         }
 
@@ -242,6 +260,10 @@ export const ContentStepper = (props: any): JSX.Element => {
         }
         if (newState.step === STEP_COUNT_MAX) {
             newState.next = 0;
+
+            newState.start = 0;
+            newState.toflash = 1;
+            newState.cancel = 1;
         } else {
             newState.next = 1;
         }

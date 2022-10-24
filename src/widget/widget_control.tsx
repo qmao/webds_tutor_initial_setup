@@ -79,7 +79,6 @@ export default function WidgetControl(props: IProps): JSX.Element {
                     spacing={3}
                     sx={{ width: 400 }}
                 >
-                    {addActionButtion(props.state.done, "done", "Done")}
                     {addActionButtion(props.state.start, "start", "Start")}
                     {props.state.progress === 0 &&
                         addActionButtion(props.state.cancel, "cancel", "Cancel")}
@@ -88,6 +87,7 @@ export default function WidgetControl(props: IProps): JSX.Element {
                     {addActionButtion(props.state.apply, "apply", "Apply")}
                     {addActionButtion(props.state.clear, "clear", "Clear")}
                     {addActionButtion(props.state.accept, "accept", "Accept")}
+                    {addActionButtion(props.state.toflash, "toflash", "Write To Flash")}
                 </Stack>
                 <Button
                     size="small"
