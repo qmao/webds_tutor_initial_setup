@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 
-import { Stack, Button, Zoom } from "@mui/material";
+import { Stack, Button } from "@mui/material";
 import { WidgetAttributes } from "./widget_constant";
 
 const HEIGHT_CONTROLS = 100;
@@ -29,15 +29,13 @@ export default function WidgetControl(props: IProps): JSX.Element {
         return (
             <>
                 {show === 1 && (
-                    <Zoom in={show}>
-                        <Button
-                            sx={{ width: 150 }}
-                            onClick={() => props.onAction(action)}
-                            disabled={props.isInitProcess === true}
-                        >
-                            {name}
-                        </Button>
-                    </Zoom>
+                    <Button
+                        sx={{ width: 150 }}
+                        onClick={() => props.onAction(action)}
+                        disabled={props.isInitProcess === true}
+                    >
+                        {name}
+                    </Button>
                 )}
             </>
         );

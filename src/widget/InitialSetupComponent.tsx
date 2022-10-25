@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export default function InitialSetupComponent(props: IProps) {
-    const [dataReady, setDataReady] = useState(true);
+    const [dataReady, setDataReady] = useState(false);
 
     async function checkConfigJson() {
         let ret;
@@ -33,8 +33,9 @@ export default function InitialSetupComponent(props: IProps) {
     }
 
     useEffect(() => {
-        checkConfigJson();
-        setDataReady(true);
+        checkConfigJson().then(() => {
+            setDataReady(true);
+        })
     }, []);
 
     function ShowContent() {

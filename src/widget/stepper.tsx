@@ -250,24 +250,6 @@ export const ContentStepper = (props: any): JSX.Element => {
         controlStateRef.current = newState;
     }
 
-    /*
-    useEffect(() => {
-        if (actionQueueRef.current[actionQueueRef.current.length - 1] === "start") {
-            actionQueueRef.current.pop();
-            //fixme need to handle cancel action properly
-            myPromise().then(() => {
-                if (actionQueueRef.current[actionQueueRef.current.length - 1] === "terminate") {
-                    actionQueueRef.current.pop();
-                } else {
-                    tutorRef.current.update();
-                    onAction("progress");
-                }
-            });
-        }
-        controlStatePrevRef.current = controlState;
-    }, [controlState]);
-    */
-
     function showStep() {
         return (
             <Stack>
