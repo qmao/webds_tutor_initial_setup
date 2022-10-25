@@ -48,7 +48,6 @@ export const ContentStepper = (props: any): JSX.Element => {
     const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
 
     function updateTutorRef(ref: any) {
-        console.log("QQQQQQQQQQQ updateTutorRef:", ref);
         tutorRef.current = ref;
     }
 
@@ -157,9 +156,6 @@ export const ContentStepper = (props: any): JSX.Element => {
     async function onAction(action: string) {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
-        console.log("QQQQQQQQQQQQQQQ:", action, controlState.step);
-        console.log("QQQQQQQQQQQQQ CURRENT:", tutorRef.current);
-        console.log("QQQQQQQQQQQQQ action POS:", tutorRef.current.action);
         switch (action) {
             case "progress":
                 if (controlState.step === 0) {
@@ -249,7 +245,7 @@ export const ContentStepper = (props: any): JSX.Element => {
             newState.next = 1;
         }
 
-        console.log(newState);
+        //console.log(newState);
         setControlState(newState);
         controlStateRef.current = newState;
     }

@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export default function InitialSetupComponent(props: IProps) {
-    const [dataReady, setDataReady] = useState(false);
+    const [dataReady, setDataReady] = useState(true);
 
     async function checkConfigJson() {
         let ret;
@@ -33,13 +33,8 @@ export default function InitialSetupComponent(props: IProps) {
     }
 
     useEffect(() => {
-        setDataReady(false);
-        checkConfigJson().then((ret) => {
-            setDataReady(true);   
-        })
-        .catch((e) => {
-            alert(e);
-        })
+        checkConfigJson();
+        setDataReady(true);
     }, []);
 
     function ShowContent() {
@@ -91,6 +86,7 @@ export default function InitialSetupComponent(props: IProps) {
     return (
         <div className="jp-webds-widget-body">
             <ThemeProvider theme={theme}>
+                <>
                 {dataReady && showAll()}
                 {!dataReady &&
                     <div
@@ -104,6 +100,7 @@ export default function InitialSetupComponent(props: IProps) {
                         <CircularProgress color="primary" />
                     </div>
                 }
+               </>
             </ThemeProvider>
         </div>
     );
