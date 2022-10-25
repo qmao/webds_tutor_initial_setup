@@ -303,13 +303,11 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
 
     function showDescription() {
         let description;
-        if (props.state.apply === 0) {
-            if (eventSource.current) {
-                description = AttributesMaxCapacitance.descriptionProgress;
-            }
-            else {
-                description = AttributesMaxCapacitance.description;
-            }
+        if (props.state.progress === 1) {
+            description = AttributesMaxCapacitance.descriptionProgress;
+        }
+        else if (props.state.apply === 0) {
+            description = AttributesMaxCapacitance.description;
         } else {
             description = AttributesMaxCapacitance.descriptionApply;
         }
