@@ -48,6 +48,7 @@ export const ContentStepper = (props: any): JSX.Element => {
     const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
 
     function updateTutorRef(ref: any) {
+        console.log("QQQQQQQQQQQ updateTutorRef:", ref);
         tutorRef.current = ref;
     }
 
@@ -157,6 +158,8 @@ export const ContentStepper = (props: any): JSX.Element => {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
         console.log("QQQQQQQQQQQQQQQ:", action, controlState.step);
+        console.log("QQQQQQQQQQQQQ CURRENT:", tutorRef.current);
+        console.log("QQQQQQQQQQQQQ action POS:", tutorRef.current.action);
         switch (action) {
             case "progress":
                 if (controlState.step === 0) {
@@ -201,8 +204,6 @@ export const ContentStepper = (props: any): JSX.Element => {
                 await tutorRef.current.action(action);
                 break;
             case "toflash":
-                console.log("QQQQQQQQQQQQQ CURRENT:", tutorRef.current);
-                console.log("QQQQQQQQQQQQQ action POS:", tutorRef.current);
                 await tutorRef.current.action(action);
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
                 break;

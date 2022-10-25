@@ -10,7 +10,7 @@ import {
     Stack
 } from "@mui/material";
 
-import { SendWriteToFlash } from "./tutor_api";
+import { SendWriteToFlash, GetStaticConfig } from "./tutor_api";
 
 export const AttributesFinish = {
     title: "Finish Tuning",
@@ -34,11 +34,11 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
 
     useImperativeHandle(ref, () => ({
         async action(action: any) {
+            let data;
             switch (action) {
                 case "toflash":
-                    props.updateInitState(false);
-                    props.updateInitState(true);
-                    await SendWriteToFlash();
+                    data = await SendWriteToFlash();
+                    console.log(data);
                     break;
                 default:
                     break;
@@ -49,7 +49,10 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
     useEffect(() => {
         console.log("TUTOR FINISH INIT", this);
         props.updateRef(this);
-        props.updateInitState(true);
+        props.updateInitState(false);
+        GetStaticConfig().then((data) => {
+            props.updateInitState(true);
+        });
     }, []);
 
     function showDescription() {
@@ -87,7 +90,7 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
         <Stack spacing={2}>
             <Stack direction="row" alignItems="flex-start" spacing={3} sx={{ m: 1 }}>
                 <Stack direction="column" sx={{mt: 5, ml: 1}}>
-                    {showDescription()}
+                    {props.state.toflash && showDescription()}
                 </Stack>
             </Stack>
         </Stack>
