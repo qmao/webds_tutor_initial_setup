@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ISettingRegistry } from "@jupyterlab/settingregistry";
 
-import { Stack, Paper, Typography } from "@mui/material";
+import { Stack, Paper, Typography, CircularProgress } from "@mui/material";
 
 import { ContentStepper } from "./stepper";
 import { ThemeProvider } from "@mui/material/styles";
@@ -19,6 +19,29 @@ interface IProps {
 }
 
 export default function InitialSetupComponent(props: IProps) {
+    const [dataReady, setDataReady] = useState(false);
+
+    async function checkConfigJson() {
+        let ret;
+        const external = props.service.pinormos.isExternal();
+        if (external) {
+            ret = await props.service.packrat.cache.addPublicConfig();
+        } else {
+            ret = await props.service.packrat.cache.addPrivateConfig();
+        }
+        console.log(ret);
+    }
+
+    useEffect(() => {
+        setDataReady(false);
+        checkConfigJson().then((ret) => {
+            setDataReady(true);   
+        })
+        .catch((e) => {
+            alert(e);
+        })
+    }, []);
+
     function ShowContent() {
         return <ContentStepper />;
     }
@@ -64,13 +87,23 @@ export default function InitialSetupComponent(props: IProps) {
     }
 
     const theme = props.service.ui.getWebDSTheme();
-    ///const theme = getWebDSTheme();
 
     return (
         <div className="jp-webds-widget-body">
             <ThemeProvider theme={theme}>
-                {showAll()}
-                <div></div>
+                {dataReady && showAll()}
+                {!dataReady &&
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)"
+                        }}
+                    >
+                        <CircularProgress color="primary" />
+                    </div>
+                }
             </ThemeProvider>
         </div>
     );
