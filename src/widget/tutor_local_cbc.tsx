@@ -54,30 +54,34 @@ interface IProps {
     onAction: any;
 }
 
+interface IRange {
+    name: any;
+    value: any;
+}
 //const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const PROGRESS_WIDTH = 250;
 const PROGRESS_HEIGHT = 30;
 
 export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
-    const [cbcCurrent, setCbcCurrent] = useState([]);
-    const [cbcPrev, setCbcPrev] = useState([]);
+    const [cbcCurrent, setCbcCurrent] = useState<number[]>([]);
+    const [cbcPrev, setCbcPrev] = useState<number[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [progress, setProgress] = useState(0);
     const [frameCount, setFrameCount] = useState(5);
 
-    const cbcRange = useRef([]);
+    const cbcRange = useRef<IRange[]>([]);
 
     const [imageProcessing, setImageProcessing] = useState(false);
     const [imageA, setImageA] = useState([]);
     const [imageB, setImageB] = useState([]);
 
-    const eventSource = useRef(undefined);
+    const eventSource = useRef<undefined | EventSource>(undefined);
     const eventError = useRef(false);
     const dataReady = useRef(false);
 
     function convertCbcToString(cbc: any) {
-        let strValue = cbc.map((v, i) => {
+        let strValue = cbc.map((v: any, i: any) => {
             if (v === 32) {
                 return "0";
             } else if (v < 32) {
@@ -90,7 +94,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     }
 
     function convertStringToCbc(cbc: any) {
-        let value = cbc.map((v, i) => {
+        let value = cbc.map((v: any, i: any) => {
             if (v === 0) {
                 return 32;
             }
@@ -107,8 +111,8 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
 
     async function GetLocalCBC(): Promise<number[]> {
         try {
-            let config = await GetStaticConfig();
-            let cbc = config["imageCBCs"];
+            let config: any = await GetStaticConfig();
+            let cbc: any = config["imageCBCs"];
             return convertCbcToString(cbc);
         } catch (err) {
             return Promise.reject(err);
@@ -171,9 +175,9 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
 
     const removeEvent = () => {
         const SSE_CLOSED = 2;
-        if (eventSource.current && eventSource.current.readyState !== SSE_CLOSED) {
-            eventSource.current.removeEventListener(eventType, eventHandler, false);
-            eventSource.current.close();
+        if (eventSource.current && eventSource.current!.readyState !== SSE_CLOSED) {
+            eventSource.current!.removeEventListener(eventType, eventHandler, false);
+            eventSource.current!.close();
             eventSource.current = undefined;
         }
     };
@@ -191,12 +195,12 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         }
         eventError.current = false;
         eventSource.current = new window.EventSource(eventRoute);
-        eventSource.current.addEventListener(eventType, eventHandler, false);
-        eventSource.current.addEventListener("error", errorHandler, false);
+        eventSource.current!.addEventListener(eventType, eventHandler, false);
+        eventSource.current!.addEventListener("error", errorHandler, false);
     };
 
-    const handleSelectChange = (value: string | any[], index: number) => {
-        let newCbc = [...cbcCurrent];
+    const handleSelectChange = (value: any, index: number) => {
+        let newCbc: any = [...cbcCurrent];
         newCbc[index] = value;
         setCbcCurrent(newCbc);
     };
@@ -391,7 +395,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                             sx: { padding: "0 !important" }
                                         }}
                                     >
-                                        {cbcRange.current.map((element) => {
+                                        {cbcRange.current.map((element: any) => {
                                             return (
                                                 <MenuItem
                                                     key={`FormHelperText-CBC-${value}-${index}-${element.name}`}

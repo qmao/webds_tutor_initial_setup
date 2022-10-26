@@ -92,7 +92,7 @@ export const ContentStepper = (props: any): JSX.Element => {
 
     }, []);
 
-    function showStepTitle(step, index) {
+    function showStepTitle(step: any, index: any) {
         const btnParam = {
             width: "100%"
         };
@@ -150,6 +150,7 @@ export const ContentStepper = (props: any): JSX.Element => {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
         updateInitState(false);
+
         switch (action) {
             case "progress":
                 if (controlState.step === 0) {
@@ -171,6 +172,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                 break;
             case "clear":
                 newState = JSON.parse(JSON.stringify(controlState));
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 break;
             case "accept":
@@ -178,6 +180,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                 newState.apply = 1;
                 newState.cancel = 1;
                 newState.start = 0;
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 break;
             case "start":
@@ -191,13 +194,16 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.clear = 1;
                     newState.accept = 1;
                 }
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 break;
             case "toflash":
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
                 break;
             case "apply":
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 if (controlState.step !== STEP_COUNT_MAX) {
                     newState.step = controlState.step + 1;
@@ -209,6 +215,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                     newState.cancel = 0;
                     newState.progress = 0;
                 }
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 break;
             case "cancel":
@@ -220,6 +227,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                 if (controlState.step === 2) {
                     newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
                 }
+                // @ts-ignore: Object is possibly 'null'.
                 await tutorRef.current.action(action);
                 break;
         }

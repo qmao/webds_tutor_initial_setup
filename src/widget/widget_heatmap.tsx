@@ -46,7 +46,7 @@ export const Heatmap = (props: IProps): JSX.Element => {
         if (props.max) {
             return props.max;
         }
-        var maxRow = data.map(function (row) {
+        var maxRow = data.map(function (row: any) {
             return Math.max.apply(Math, row);
         });
         var max = Math.max.apply(null, maxRow);
@@ -57,7 +57,7 @@ export const Heatmap = (props: IProps): JSX.Element => {
         if (props.min) {
             return props.min;
         }
-        var minRow = data.map(function (row) {
+        var minRow = data.map(function (row: any) {
             return Math.min.apply(Math, row);
         });
         var min = Math.min.apply(null, minRow);
@@ -96,16 +96,16 @@ export const Heatmap = (props: IProps): JSX.Element => {
         return ColorTable[value][2];
     }
 
-    function componentToHex(c) {
+    function componentToHex(c: any) {
         var hex = c.toString(16);
         return hex.length === 1 ? "0" + hex : hex;
     }
 
-    function rgbToHex(r, g, b) {
+    function rgbToHex(r: any, g: any, b: any) {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
-    const getColorFromMap = (value) => {
+    const getColorFromMap = (value: any) => {
         let r = Math.floor(red(value) * 255);
         let g = Math.floor(green(value) * 255);
         let b = Math.floor(blue(value) * 255);
@@ -172,9 +172,9 @@ export const Heatmap = (props: IProps): JSX.Element => {
 
     function hover(
         e: any,
-        y: number | undefined,
-        x: number | undefined,
-        value: number | undefined,
+        y: number,
+        x: number,
+        value: number,
         state: boolean
     ) {
         if (state) {
@@ -233,7 +233,7 @@ export const Heatmap = (props: IProps): JSX.Element => {
                         borderColor: "black"
                     }}
                 >
-                    {range.map((v) => (
+                    {range.map((v: any) => (
                         <Stack
                             key={`range-color-${v}`}
                             sx={{ backgroundColor: v, height: pixelRangeHeight }}
@@ -303,12 +303,12 @@ export const Heatmap = (props: IProps): JSX.Element => {
                                     {SHOW_INDEX && (
                                         <Stack direction="row">
                                             {showPixel(1, 1, "C/R")}
-                                            {props.image[0].map((value, index) => (
+                                            {props.image[0].map((value: any, index: any) => (
                                                 <> {showPixel(1, 1, `${index}`)}</>
                                             ))}
                                         </Stack>
                                     )}
-                                    {props.image.map((value, row) => (
+                                    {props.image.map((value: any, row: any) => (
                                         <Stack direction="row" key={`heatmap-stack-top-${row}`}>
                                             <Stack
                                                 direction="column"
@@ -321,7 +321,7 @@ export const Heatmap = (props: IProps): JSX.Element => {
                                                     justifyContent="center"
                                                     key={`heatmap-stack-sub-${row}`}
                                                 >
-                                                    {value.map((element, column) =>
+                                                    {value.map((element: any, column: any) =>
                                                         showPixelContent(element, row, column)
                                                     )}
                                                 </Stack>

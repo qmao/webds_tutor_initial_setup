@@ -1,6 +1,6 @@
 import { requestAPI } from "../handler";
 
-export async function SendUpdateStaticConfig(dataToSend): Promise<string> {
+export async function SendUpdateStaticConfig(dataToSend: any): Promise<string> {
     try {
         const reply = await requestAPI<any>(`config/static`, {
             body: JSON.stringify(dataToSend),
@@ -14,10 +14,10 @@ export async function SendUpdateStaticConfig(dataToSend): Promise<string> {
 }
 
 export async function SendWriteToFlash(): Promise<string | undefined> {
+    var dataToSend = {
+        command: "commitConfig"
+    };
     try {
-        var dataToSend = {
-            command: "commitConfig"
-        };
         const reply = await requestAPI<any>("command", {
             body: JSON.stringify(dataToSend),
             method: "POST"
@@ -104,8 +104,9 @@ export async function GetStaticConfig(): Promise<string> {
     }
 }
 
+/*
 export async function SendGetImageTest() {
-    let image = [];
+    let image: any = [];
 
     const c = 40;
     const r = 50;
@@ -118,6 +119,7 @@ export async function SendGetImageTest() {
     });
     return image;
 }
+*/
 
 const getReport = async (rtype: string): Promise<void> => {
     try {
@@ -137,7 +139,6 @@ const getReport = async (rtype: string): Promise<void> => {
 };
 
 export async function SendGetImage(rtype: string): Promise<any> {
-    //return SendGetImageTest();
     let image = await getReport(rtype);
     return image;
 }

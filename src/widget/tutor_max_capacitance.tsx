@@ -53,7 +53,7 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
 
     const stateRef = useRef(props.state);
 
-    const eventSource = useRef(undefined);
+    const eventSource = useRef<undefined | EventSource>(undefined);
     const eventError = useRef(false);
     const dataReady = useRef(false);
 
@@ -82,9 +82,9 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
 
     const removeEvent = () => {
         const SSE_CLOSED = 2;
-        if (eventSource.current && eventSource.current.readyState !== SSE_CLOSED) {
-            eventSource.current.removeEventListener(eventType, eventHandler, false);
-            eventSource.current.close();
+        if (eventSource.current && eventSource.current!.readyState !== SSE_CLOSED) {
+            eventSource.current!.removeEventListener(eventType, eventHandler, false);
+            eventSource.current!.close();
             eventSource.current = undefined;
         }
     };
@@ -101,8 +101,8 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
         }
         eventError.current = false;
         eventSource.current = new window.EventSource(eventRoute);
-        eventSource.current.addEventListener(eventType, eventHandler, false);
-        eventSource.current.addEventListener("error", errorHandler, false);
+        eventSource.current!.addEventListener(eventType, eventHandler, false);
+        eventSource.current!.addEventListener("error", errorHandler, false);
     };
 
     async function SendClearMaxCap() {
@@ -183,8 +183,8 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
 
     async function GetMaxCapFromStaticConfig(): Promise<number> {
         try {
-            let config = await GetStaticConfig();
-            let data = config["saturationLevel"];
+            let config: any = await GetStaticConfig();
+            let data: any = config["saturationLevel"];
             return data;
         } catch (err) {
             return Promise.reject(err);
