@@ -85,24 +85,24 @@ export default function InitialSetupComponent(props: IProps) {
     const theme = props.service.ui.getWebDSTheme();
 
     return (
-        <div className="jp-webds-widget-body">
+        <>
             <ThemeProvider theme={theme}>
-                <>
+            <div className="jp-webds-widget-body">
                 {dataReady && showAll()}
-                {!dataReady &&
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)"
-                        }}
-                    >
-                        <CircularProgress color="primary" />
-                    </div>
-                }
-               </>
+            </div>
+            {!dataReady &&
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)"
+                    }}
+                >
+                    <CircularProgress color="primary" />
+                </div>
+            }
             </ThemeProvider>
-        </div>
+        </>
     );
 }
