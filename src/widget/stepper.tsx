@@ -156,6 +156,7 @@ export const ContentStepper = (props: any): JSX.Element => {
     async function onAction(action: string) {
         let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
         newState.step = controlState.step;
+        updateInitState(false);
         switch (action) {
             case "progress":
                 if (controlState.step === 0) {
@@ -229,6 +230,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                 await tutorRef.current.action(action);
                 break;
         }
+        updateInitState(true);
 
         if (newState.step === 0) {
             newState.back = 0;
@@ -239,8 +241,8 @@ export const ContentStepper = (props: any): JSX.Element => {
             newState.next = 0;
 
             newState.start = 0;
+            newState.cancel = 0;
             newState.toflash = 1;
-            newState.cancel = 1;
         } else {
             newState.next = 1;
         }

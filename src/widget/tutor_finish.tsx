@@ -71,7 +71,7 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
                     firmware restart.
                 </Typography>
                 <Typography variant="caption" display="block" sx={{ fontWeight: 'bold' }}>
-                    Cancel
+                    Skip
                 </Typography>
                 <Typography
                     variant="caption"

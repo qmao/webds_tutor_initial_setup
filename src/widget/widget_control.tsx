@@ -86,6 +86,7 @@ export default function WidgetControl(props: IProps): JSX.Element {
                     {addActionButtion(props.state.apply, "apply", "Apply")}
                     {addActionButtion(props.state.clear, "clear", "Clear")}
                     {addActionButtion(props.state.accept, "accept", "Accept")}
+                    {addActionButtion(props.state.toflash, "cancel", "Skip")}
                     {addActionButtion(props.state.toflash, "toflash", "Write To Flash")}
                 </Stack>
                 <Button

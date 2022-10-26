@@ -141,19 +141,15 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
             let data;
             switch (action) {
                 case "start":
-                    props.updateInitState(false);
                     let image = await SendGetImage("delta");
                     setImageA(image);
 
                     addEvent();
-                    props.updateInitState(true);
                     await SendCollectMaxCap();
                     break;
                 case "apply":
-                    props.updateInitState(false);
                     data = await SendUpdateStaticConfig({ saturationLevel: signalCumulativeMax });
                     console.log(data);
-                    props.updateInitState(true);
                     break;
                 case "clear":
                     data = await SendClearMaxCap();
@@ -166,7 +162,6 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     console.log(data);
                     break;
                 case "accept":
-                    props.updateInitState(false);
                     removeEvent();
                     await SendTerminateMaxCap();
                     try {
@@ -179,7 +174,6 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
                     finally {
                         dataReady.current = true;
                         setImageReady(true);
-                        props.updateInitState(true);
                     }
                     break;
                 default:

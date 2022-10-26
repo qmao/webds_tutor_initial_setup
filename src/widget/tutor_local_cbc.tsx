@@ -283,7 +283,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                     await SendUpdateStaticConfig({ imageCBCs: data });
                     break;
             }
-
         }
     }));
 
