@@ -12,15 +12,15 @@ import InitialSetupComponent from "./InitialSetupComponent";
 export class InitialSetupWidget extends ReactWidget {
     _id: string;
     _service: WebDSService;
-    _settingRegistry: ISettingRegistry | null = null;
+    _settingRegistry: ISettingRegistry;
     /**
     * Constructs a new CounterWidget.
     */
-    constructor(id: string, service: WebDSService, settingRegistry?: ISettingRegistry | null) {
+    constructor(id: string, service: WebDSService, settingRegistry: ISettingRegistry) {
         super();
         this._id = id;
         this._service = service;
-        this._settingRegistry = settingRegistry || null;
+        this._settingRegistry = settingRegistry;
         console.log(this._settingRegistry);
     }
 

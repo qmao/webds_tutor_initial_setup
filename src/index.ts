@@ -27,7 +27,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     app: JupyterFrontEnd,
     launcher: ILauncher,
     restorer: ILayoutRestorer,
-    settingRegistry: ISettingRegistry | null,
+    settingRegistry: ISettingRegistry,
     service: WebDSService ) => {
     console.log('JupyterLab extension ${Attributes.label} is activated!');
 
