@@ -130,7 +130,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                         <Typography
                             align="center"
                             sx={{
-                                fontSize: 1,
+                                fontSize: 12,
                                 color: "white"
                             }}
                         >
