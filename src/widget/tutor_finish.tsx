@@ -10,7 +10,7 @@ import {
     Stack
 } from "@mui/material";
 
-import { SendWriteToFlash, GetStaticConfig } from "./tutor_api";
+import { SendWriteToFlash } from "./tutor_api";
 
 export const AttributesFinish = {
     title: "Finish Tuning",
@@ -19,7 +19,6 @@ export const AttributesFinish = {
 
 interface IProps {
     state: any;
-    updateRef: any;
     updateInitState: any;
     onAction: any;
 }
@@ -48,11 +47,6 @@ export const TutorFinish = forwardRef((props: IProps, ref: any) => {
 
     useEffect(() => {
         console.log("TUTOR FINISH INIT", this);
-        props.updateRef(this);
-        props.updateInitState(false);
-        GetStaticConfig().then((data) => {
-            props.updateInitState(true);
-        });
     }, []);
 
     function showDescription() {

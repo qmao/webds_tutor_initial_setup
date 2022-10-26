@@ -38,7 +38,6 @@ export const AttributesMaxCapacitance = {
 
 interface IProps {
     state: any;
-    updateRef: any;
     updateInitState: any;
     onAction: any;
 }
@@ -194,7 +193,6 @@ export const TutorMaxCapacitance = forwardRef((props: IProps, ref: any) => {
 
     useEffect(() => {
         console.log("TUTOR MAX CAP INIT");
-        props.updateRef(this);
         props.updateInitState(false);
         setImageReady(false);
         setSignalCumulativeMax("");

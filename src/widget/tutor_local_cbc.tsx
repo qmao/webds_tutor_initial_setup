@@ -50,7 +50,6 @@ export const AttributesLocalCBC = {
 
 interface IProps {
     state: any;
-    updateRef: any;
     updateInitState: any;
     onAction: any;
 }
@@ -204,7 +203,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
 
     useEffect(() => {
         console.log("TUTOR LOCAL CBC INIT");
-        props.updateRef(this);
 
         props.updateInitState(false);
 

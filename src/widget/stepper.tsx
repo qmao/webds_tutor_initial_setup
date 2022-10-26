@@ -47,10 +47,6 @@ export const ContentStepper = (props: any): JSX.Element => {
     const [initState, setInitState] = useState(false);
     const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
 
-    function updateTutorRef(ref: any) {
-        tutorRef.current = ref;
-    }
-
     function updateInitState(state: any) {
         console.log("STEP updateInitState:", state);
         setInitState(!state);
@@ -63,7 +59,6 @@ export const ContentStepper = (props: any): JSX.Element => {
                 <TutorLocalCBC
                     ref={tutorRef}
                     state={controlState}
-                    updateRef={updateTutorRef}
                     updateInitState={updateInitState}
                     onAction={onAction}
                 />
@@ -75,7 +70,6 @@ export const ContentStepper = (props: any): JSX.Element => {
                 <TutorMaxCapacitance
                     ref={tutorRef}
                     state={controlState}
-                    updateRef={updateTutorRef}
                     updateInitState={updateInitState}
                     onAction={onAction}
                 />
@@ -87,7 +81,6 @@ export const ContentStepper = (props: any): JSX.Element => {
                 <TutorFinish
                     ref={tutorRef}
                     state={controlState}
-                    updateRef={updateTutorRef}
                     updateInitState={updateInitState}
                     onAction={onAction}
                 />
