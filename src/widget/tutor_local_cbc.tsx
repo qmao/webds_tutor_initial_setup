@@ -68,7 +68,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
     const [cbcPrev, setCbcPrev] = useState<number[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [frameCount, setFrameCount] = useState(5);
+    const [frameCount, setFrameCount] = useState(10);
 
     const cbcRange = useRef<IRange[]>([]);
 
