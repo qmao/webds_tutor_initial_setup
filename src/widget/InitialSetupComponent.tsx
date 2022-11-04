@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ISettingRegistry } from "@jupyterlab/settingregistry";
 
-import { Stack, Paper, Typography, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 import { ContentStepper } from "./stepper";
 import { ThemeProvider } from "@mui/material/styles";
@@ -9,9 +9,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import { WebDSService } from "@webds/service";
 import { WidgetAttributes } from "./widget_constant";
 
-const HEIGHT_TITLE = 70;
-const HEIGHT_CONTENT_MIN = 300;
-const EXTENSION_TITLE = "Initial Setup";
+import { Canvas } from "./mui_extensions/Canvas";
+import { Content } from "./mui_extensions/Content";
+
 
 interface IProps {
     service: WebDSService;
@@ -44,41 +44,11 @@ export default function InitialSetupComponent(props: IProps) {
 
     function showAll() {
         return (
-            <Stack spacing={2}>
-                <Paper
-                    elevation={0}
-                    sx={{
-                        width: WidgetAttributes.rootWidgetHeight + "px",
-                        height: HEIGHT_TITLE + "px",
-                        position: "relative",
-                        bgcolor: "section.main"
-                    }}
-                >
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)"
-                        }}
-                    >
-                        {EXTENSION_TITLE}
-                    </Typography>
-                </Paper>
-
-                <Stack
-                    direction="row"
-                    alignItems="stretch"
-                    sx={{
-                        width: WidgetAttributes.rootWidgetHeight + "px",
-                        minHeight: HEIGHT_CONTENT_MIN + "px",
-                        bgcolor: "section.main"
-                    }}
-                >
+            <Canvas title="Initial Setup" sx={{ width: WidgetAttributes.rootWidgetWidth + 24 * 2 }}>
+                <Content sx={{ p: 0 }}>
                     {ShowContent()}
-                </Stack>
-            </Stack>
+                </Content>
+            </Canvas>
         );
     }
 

@@ -3,8 +3,7 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 
 import { Stack, Button } from "@mui/material";
 import { WidgetAttributes } from "./widget_constant";
-
-const HEIGHT_CONTROLS = 100;
+import { Controls } from "./mui_extensions/Controls";
 
 interface IProps {
     onAction(action: string): any;
@@ -42,22 +41,19 @@ export default function WidgetControl(props: IProps): JSX.Element {
     }
 
     return (
-        <Stack
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-                width: WidgetAttributes.rootWidgetHeight + "px",
-                minHeight: HEIGHT_CONTROLS + "px",
-                bgcolor: "section.main"
-            }}
+            <Controls
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
         >
-            <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="stretch"
-                spacing={2}
-                sx={{ width: WidgetAttributes.rootWidgetHeight }}
-            >
+            <Stack direction="row" sx={{
+                alignItems: "stretch",
+                justifyContent: "space-between",
+                width: WidgetAttributes.rootWidgetWidth
+            }}>
                 <Button
                     size="small"
                     disabled={
@@ -102,7 +98,7 @@ export default function WidgetControl(props: IProps): JSX.Element {
                     Next
           <KeyboardArrowRight />
                 </Button>
-            </Stack>
-        </Stack>
+                </Stack>
+            </Controls>
     );
 }
