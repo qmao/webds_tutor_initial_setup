@@ -328,7 +328,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                             alignItems="flex-end"
                             sx={{
                                 border: 0,
-                                borderColor: "section.main",
+                                //borderColor: "section.main",
                                 width: 120,
                                 height: 38,
                                 mt: 2
@@ -348,7 +348,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                 sx={{
                                     border: 1,
                                     borderColor: "colors.grey",
-                                    bgcolor: "section.main",
+                                    //bgcolor: "section.main",
                                     width: 120
                                 }}
                             >
@@ -412,7 +412,7 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                                             sx={{
                                                 border: 1,
                                                 borderColor: "colors.grey",
-                                                bgcolor: "section.main"
+                                                //bgcolor: "section.main"
                                             }}
                                         >
                                             <Typography
