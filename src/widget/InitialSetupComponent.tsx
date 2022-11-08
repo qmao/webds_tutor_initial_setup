@@ -18,7 +18,8 @@ interface IProps {
     settingRegistry: ISettingRegistry;
 }
 
-export default function InitialSetupComponent(props: IProps) {
+export const InitialSetupComponent = (props: IProps): JSX.Element => {
+
     const [dataReady, setDataReady] = useState(false);
 
     async function checkConfigJson() {
@@ -76,3 +77,5 @@ export default function InitialSetupComponent(props: IProps) {
         </>
     );
 }
+
+export default InitialSetupComponent;
