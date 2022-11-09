@@ -7,7 +7,8 @@ import {
     Paper,
     Box,
     CircularProgress,
-    LinearProgress
+    LinearProgress,
+    Divider
 } from "@mui/material";
 
 import { TutorLocalCBC, AttributesLocalCBC } from "./tutor_local_cbc";
@@ -16,10 +17,7 @@ import {
     AttributesMaxCapacitance
 } from "./tutor_max_capacitance";
 
-import {
-    TutorFinish,
-    AttributesFinish
-} from "./tutor_finish";
+import { TutorFinish, AttributesFinish } from "./tutor_finish";
 
 import { WidgetAttributes } from "./widget_constant";
 import WidgetControl from "./widget_control";
@@ -88,9 +86,7 @@ export const ContentStepper = (props: any): JSX.Element => {
         }
     ];
 
-    useEffect(() => {
-
-    }, []);
+    useEffect(() => { }, []);
 
     function showStepTitle(step: any, index: any) {
         const btnParam = {
@@ -113,8 +109,8 @@ export const ContentStepper = (props: any): JSX.Element => {
             param.bgcolor = "primary.main";
             textParam.color = "primary.main";
         } else {
-            param.bgcolor = "colors.grey";
-            textParam.color = "colors.grey";
+            param.bgcolor = "text.disabled";
+            textParam.color = "text.disabled";
         }
 
         return (
@@ -134,7 +130,7 @@ export const ContentStepper = (props: any): JSX.Element => {
                                 color: "white"
                             }}
                         >
-                            {index}
+                            {index + 1}
                         </Typography>
                     </Stack>
                 }
@@ -273,7 +269,7 @@ export const ContentStepper = (props: any): JSX.Element => {
 
     function showFeedback() {
         return (
-            <Box sx={{ position: "relative", display: "inline-flex"}}>
+            <Box sx={{ position: "relative", display: "inline-flex" }}>
                 <Paper
                     elevation={0}
                     sx={{
@@ -314,23 +310,20 @@ export const ContentStepper = (props: any): JSX.Element => {
                 sx={{ m: 1 }}
             >
                 {showStep()}
+                <Divider orientation="vertical" flexItem />
                 {showFeedback()}
             </Stack>
-            <Paper
-                elevation={0}
-                sx={{
-                    width: "100%",
-                    height: 16,
-                    bgcolor: "palette.background.default"
-                }}
-            >
-                {false && controlState.progress === 1 && (
-                    <Box sx={{ width: "100%" }}>
-                        <LinearProgress />
-                    </Box>
-                )}
-            </Paper>
-            <WidgetControl state={controlState} onAction={onAction} isInitProcess={initState}/>
+            {false && controlState.progress === 1 && (
+                <Box sx={{ width: "100%" }}>
+                    <LinearProgress />
+                </Box>
+            )}
+            <Divider />
+            <WidgetControl
+                state={controlState}
+                onAction={onAction}
+                isInitProcess={initState}
+            />
         </Stack>
     );
 };
