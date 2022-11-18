@@ -57,7 +57,8 @@ export const CommonChart = (props: IProps) => {
         if (adbCumulativeMax > adcChartMax / 2) {
             adcChartMax = adbCumulativeMax * 2;
         }
-        let peakResponse = (adbCumulativeMax * 100) / adcChartMax;
+        let sinalMax = adcChartMax * 1.3;
+        let peakResponse = (adbCumulativeMax * 100) / sinalMax;
         let target = 50;
 
         let targetAbs = (target * CHART_HEIGHT) / 100;
@@ -240,7 +241,9 @@ export const CommonChart = (props: IProps) => {
                             >
                                 <Typography
                                     sx={{
-                                        fontSize: 12
+                                        width: 20,
+                                        fontSize: 12,
+                                        textAlign: "center"
                                     }}
                                     style={{ transform: "scale(0.8)" }}
                                 >

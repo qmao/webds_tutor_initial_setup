@@ -44,7 +44,7 @@ interface IRange {
 const BUTTON_RADIUS = 2;
 const BUTTON_WIDTH = 100;
 const BUTTON_HEIGHT = 36;
-const rpi4 = false;
+const rpi4 = true;
 
 export const TutorLocalCBC = (props: IProps) => {
     const [cbcCurrent, setCbcCurrent] = useState<number[]>([]);
@@ -103,6 +103,29 @@ export const TutorLocalCBC = (props: IProps) => {
         }
     }
 
+    function getPostImage() {
+        SendGetImage("baseline")
+            .then((ret) => {
+                imageB.current = ret;
+                dataReady.current = true;
+                setImageProcessing(false);
+                setState("done");
+
+                updateContent(drawChart());
+                props.updateTuningResult({
+                    preParams: preRange.current,
+                    postParams: postRange.current
+                });
+            })
+            .catch((err) => {
+                dataReady.current = true;
+                setImageProcessing(false);
+                alert("eventHandler error");
+                alert(err);
+                setState("start");
+            });
+    }
+
     const eventType = "LocalCBC";
     const eventRoute = "/webds/tutor/event";
 
@@ -113,20 +136,7 @@ export const TutorLocalCBC = (props: IProps) => {
             setProgress(data.progress);
         } else if (data.state === "stop") {
             setCbcCurrent(convertCbcToString(data.data));
-            SendGetImage("baseline")
-                .then((ret) => {
-                    imageB.current = ret;
-                    dataReady.current = true;
-                    setImageProcessing(false);
-                    setState("done");
-                })
-                .catch((err) => {
-                    dataReady.current = true;
-                    setImageProcessing(false);
-                    alert("eventHandler error");
-                    alert(err);
-                    setState("start");
-                });
+            getPostImage();
         }
     };
 
@@ -168,26 +178,7 @@ export const TutorLocalCBC = (props: IProps) => {
             if (counter === 100) {
                 clearInterval(sseTimer.current);
 
-                SendGetImage("baseline")
-                    .then((ret) => {
-                        imageB.current = ret;
-                        dataReady.current = true;
-                        setImageProcessing(false);
-                        setState("done");
-
-                        updateContent(drawChart());
-                        props.updateTuningResult({
-                            preParams: preRange.current,
-                            postParams: postRange.current
-                        });
-                    })
-                    .catch((err) => {
-                        dataReady.current = true;
-                        setImageProcessing(false);
-                        alert("eventHandler error");
-                        alert(err);
-                        setState("start");
-                    });
+                getPostImage();
             }
         }, 5);
     }
@@ -366,7 +357,7 @@ export const TutorLocalCBC = (props: IProps) => {
                         <Paper
                             sx={{
                                 bgcolor: "#ffa777",
-                                width: (progress * BUTTON_WIDTH) / 100,
+                                width: progress < 2 ? 0 : (progress * BUTTON_WIDTH) / 100,
                                 height: "98%",
                                 borderRadius: BUTTON_RADIUS
                             }}

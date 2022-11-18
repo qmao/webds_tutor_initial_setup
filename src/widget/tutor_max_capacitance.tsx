@@ -29,7 +29,7 @@ interface IProps {
     tuningParams: any;
 }
 
-const rpi4 = false;
+const rpi4 = true;
 export const TutorMaxCapacitance = (props: IProps) => {
     const [dataReady, setDataReady] = React.useState(false);
     const [state, setState] = React.useState("");
@@ -211,6 +211,9 @@ export const TutorMaxCapacitance = (props: IProps) => {
         console.log("TUTOR MAX CAP INIT");
         //updateContent(<></>);
         props.updateInitState(false);
+
+        sMax.current = 0;
+        cMax.current = 0;
 
         GetMaxCapFromStaticConfig().then((data) => {
             props.updateInitState(true);
