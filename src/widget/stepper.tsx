@@ -4,12 +4,17 @@ import {
     Button,
     Stack,
     Typography,
-    Paper,
     Box,
-    CircularProgress,
-    LinearProgress,
-    Divider
+    Divider,
+    Stepper,
+    Step,
+    StepContent,
+    Avatar,
+    Snackbar,
+    Alert
 } from "@mui/material";
+
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 
 import { TutorLocalCBC, AttributesLocalCBC } from "./tutor_local_cbc";
 import {
@@ -19,68 +24,155 @@ import {
 
 import { TutorFinish, AttributesFinish } from "./tutor_finish";
 
-import { WidgetAttributes } from "./widget_constant";
-import WidgetControl from "./widget_control";
+interface IProps {
+    step: number;
+    updateStep: any;
+}
 
-const TEXT_WIDTH_CONNECT = 250;
-const STEP_LENGTH = 30;
-const STEP_COUNT_MAX = 2;
-const DEFAULT_CONTROL_STATE = {
-    next: 1,
-    back: 0,
-    start: 1,
-    apply: 0,
-    cancel: 0,
-    step: 0,
-    progress: 0,
-    toflash: 0,
-    clear: 0,
-    accept: 0
-};
+interface IAlertInfo {
+    state: boolean;
+    message: string;
+    severity: "error" | "info" | "success" | "warning";
+}
 
-export const ContentStepper = (props: any): JSX.Element => {
-    const tutorRef = useRef(null);
+interface ITuningResult {
+    preParams: [number, number];
+    postParams: [number, number];
+}
 
-    const [controlState, setControlState] = useState(DEFAULT_CONTROL_STATE);
+export const ContentStepper = (props: IProps): JSX.Element => {
     const [initState, setInitState] = useState(false);
-    const controlStateRef = useRef(DEFAULT_CONTROL_STATE);
+    const [activeStep, setActiveStep] = useState(props.step);
+    const [content, setContent] = useState(<></>);
+    const [openAlert, setOpenAlert] = useState<IAlertInfo>({
+        state: false,
+        message: "",
+        severity: "info"
+    });
+
+    const tuningResult = useRef<ITuningResult>({
+        preParams: [0, 0],
+        postParams: [0, 0]
+    });
+    const config = useRef({});
+
+    useEffect(() => {
+        setActiveStep(props.step);
+    }, [props.step]);
+
+    useEffect(() => {
+        console.log(initState);
+    }, []);
+
+    function updateTuningResult(result: ITuningResult) {
+        tuningResult.current = result;
+    }
 
     function updateInitState(state: any) {
         console.log("STEP updateInitState:", state);
         setInitState(!state);
     }
 
+    function updateStep(step: any) {
+        props.updateStep(step);
+    }
+
+    function handleStep(step: number) {
+        setActiveStep(step);
+        updateStep(step);
+    }
+
+    function onDone(data: any) {
+        if (activeStep === 2) {
+            handleStep(0);
+            config.current = {};
+        } else {
+            console.log("SAVE CONFIG:", data);
+            config.current = Object.assign({}, config.current, data);
+            console.log("CONFIG ALL:", config.current);
+            handleStep(activeStep + 1);
+        }
+    }
+
+    const handleCloseAlert = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setOpenAlert({ ...openAlert, state: false });
+    };
+
+    function displayAlert() {
+        return (
+            <Snackbar
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
+                }}
+                open={openAlert.state}
+                autoHideDuration={2000}
+                onClose={handleCloseAlert}
+            >
+                <Alert
+                    onClose={handleCloseAlert}
+                    severity={openAlert.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {openAlert.message}
+                </Alert>
+            </Snackbar>
+        );
+    }
+
+    function onConentUpdate(data: any) {
+        setContent(data);
+    }
+
     const steps = [
         {
             label: AttributesLocalCBC.title,
-            description: (
+            content: (
                 <TutorLocalCBC
-                    ref={tutorRef}
-                    state={controlState}
+                    onContentUpdate={onConentUpdate}
+                    onDone={(data: any) => {
+                        onDone(data);
+                    }}
                     updateInitState={updateInitState}
-                    onAction={onAction}
+                    updateTuningResult={updateTuningResult}
                 />
             )
         },
         {
             label: AttributesMaxCapacitance.title,
-            description: (
+            content: (
                 <TutorMaxCapacitance
-                    ref={tutorRef}
-                    state={controlState}
+                    tuningParams={[
+                        tuningResult.current["preParams"],
+                        tuningResult.current["postParams"]
+                    ]}
                     updateInitState={updateInitState}
-                    onAction={onAction}
+                    onContentUpdate={onConentUpdate}
+                    onDone={(data: any) => {
+                        onDone(data);
+                    }}
                 />
             )
         },
         {
             label: AttributesFinish.title,
-            description: (
+            content: (
                 <TutorFinish
-                    ref={tutorRef}
-                    state={controlState}
                     updateInitState={updateInitState}
-                    onAction={onAction}
+                    onContentUpdate={onConentUpdate}
+                    config={config.current}
+                    onDone={(data: any) => {
+                        onDone(data);
+                    }}
+                    onMessage={(m: any) => {
+                        setOpenAlert(m);
+                    }}
                 />
             )
         }
@@ -88,242 +180,105 @@ export const ContentStepper = (props: any): JSX.Element => {
 
     useEffect(() => { }, []);
 
-    function showStepTitle(step: any, index: any) {
-        const btnParam = {
-            width: "100%"
-        };
-
-        const textParam = {
-            fontSize: 16,
-            color: "colors.grey"
-        };
-
-        const param = {
-            bgcolor: "primary.main",
-            width: STEP_LENGTH,
-            height: STEP_LENGTH,
-            borderRadius: "50%"
-        };
-
-        if (index === controlState.step) {
-            param.bgcolor = "primary.main";
-            textParam.color = "primary.main";
-        } else {
-            param.bgcolor = "text.disabled";
-            textParam.color = "text.disabled";
+    function displayStepText(label: any, index: number) {
+        let labelColor = "text.disabled";
+        if (index === props.step) {
+            labelColor = "text.primary";
         }
 
         return (
-            <Button
-                onClick={() => {
-                    ////setActiveStep(index);
-                }}
-                variant="text"
-                style={{ justifyContent: "flex-start" }}
-                sx={btnParam}
-                startIcon={
-                    <Stack justifyContent="center" alignItems="center" sx={param}>
-                        <Typography
-                            align="center"
-                            sx={{
-                                fontSize: 12,
-                                color: "white"
-                            }}
-                        >
-                            {index + 1}
-                        </Typography>
-                    </Stack>
-                }
+            <Typography
+                sx={{ fontWeight: "bold", fontSize: 14 }}
+                color={labelColor}
+                variant="caption"
             >
-                <Typography variant="caption" sx={textParam}>
-                    {step.label}
-                </Typography>
-            </Button>
+                {label}
+            </Typography>
         );
     }
 
-    async function onAction(action: string) {
-        let newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
-        newState.step = controlState.step;
-        updateInitState(false);
+    function displayStepIcon(index: number) {
+        let error = false;
+        const param = {
+            bgcolor: "primary",
+            width: 24,
+            height: 24,
+            mr: 2,
+            color: "inherit"
+        };
 
-        switch (action) {
-            case "progress":
-                if (controlState.step === 0) {
-                    newState.progress = 0;
-                    newState.apply = 1;
-                    newState.cancel = 1;
-                    newState.start = 0;
-                } else if (controlState.step === 1) {
-                    newState.start = 0;
-                    newState.apply = 1;
-                    newState.cancel = 1;
-                }
+        switch (index) {
+            case 0:
                 break;
-            case "back":
-                newState.step = controlState.step - 1;
+            case 2:
+                //error = true;
                 break;
-            case "next":
-                newState.step = controlState.step + 1;
-                break;
-            case "clear":
-                newState = JSON.parse(JSON.stringify(controlState));
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                break;
-            case "accept":
-                newState.progress = 0;
-                newState.apply = 1;
-                newState.cancel = 1;
-                newState.start = 0;
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                break;
-            case "start":
-                if (controlState.step === 0) {
-                    newState.start = 0;
-                    newState.cancel = 1;
-                    newState.progress = 1;
-                } else if (controlState.step === 1) {
-                    newState.start = 0;
-                    newState.progress = 1;
-                    newState.clear = 1;
-                    newState.accept = 1;
-                }
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                break;
-            case "toflash":
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
-                break;
-            case "apply":
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                if (controlState.step !== STEP_COUNT_MAX) {
-                    newState.step = controlState.step + 1;
-                }
-                break;
-            case "terminate":
-                if (controlState.step === 0) {
-                    newState.start = 1;
-                    newState.cancel = 0;
-                    newState.progress = 0;
-                }
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
-                break;
-            case "cancel":
-                if (controlState.step === 0) {
-                    newState.start = 1;
-                    newState.cancel = 0;
-                    newState.progress = 0;
-                }
-                if (controlState.step === 2) {
-                    newState = JSON.parse(JSON.stringify(DEFAULT_CONTROL_STATE));
-                }
-                // @ts-ignore: Object is possibly 'null'.
-                await tutorRef.current.action(action);
+            default:
                 break;
         }
-        updateInitState(true);
 
-        if (newState.step === 0) {
-            newState.back = 0;
-        } else {
-            newState.back = 1;
-        }
-        if (newState.step === STEP_COUNT_MAX) {
-            newState.next = 0;
-
-            newState.start = 0;
-            newState.cancel = 0;
-            newState.toflash = 1;
-        } else {
-            newState.next = 1;
+        if (index === activeStep) {
+            param.bgcolor = "#007dc3";
         }
 
-        //console.log(newState);
-        setControlState(newState);
-        controlStateRef.current = newState;
+        if (error) {
+            param.bgcolor = "red";
+            param.color = "white";
+        }
+
+        return (
+            <Avatar sx={param}>
+                {error ? (
+                    <PriorityHighIcon sx={{ fontSize: 16 }} />
+                ) : (
+                        <Typography sx={{ fontSize: 14, color: "white" }}>
+                            {index + 1}
+                        </Typography>
+                    )}
+            </Avatar>
+        );
     }
 
     function showStep() {
         return (
             <Stack>
-                {steps.map((step, index) => (
-                    <Stack
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="flex-start"
-                        key={step.label}
-                        sx={{ mb: 2, width: TEXT_WIDTH_CONNECT }}
-                    >
-                        {showStepTitle(step, index)}
-                    </Stack>
-                ))}
-            </Stack>
-        );
-    }
-
-    function showFeedback() {
-        return (
-            <Box sx={{ position: "relative", display: "inline-flex" }}>
-                <Paper
-                    elevation={0}
-                    sx={{
-                        width: WidgetAttributes.interactiveContentWidth,
-                        minHeight: WidgetAttributes.stepContentHeight
-                    }}
+                <Stepper
+                    nonLinear
+                    activeStep={activeStep}
+                    orientation="vertical"
+                    sx={{ pl: 2, pt: 2 }}
                 >
-                    <Stack>
-                        <Typography>{steps[controlState.step].description}</Typography>
-                    </Stack>
-                    {initState && (
-                        <Box
-                            sx={{
-                                top: 0,
-                                left: 0,
-                                bottom: 0,
-                                right: 0,
-                                position: "absolute",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                        >
-                            <CircularProgress />
-                        </Box>
-                    )}
-                </Paper>
-            </Box>
+                    {steps.map((step: any, index: any) => (
+                        <Step key={step.label}>
+                            <Button
+                                variant="text"
+                                onClick={() => handleStep(index)}
+                                style={{ justifyContent: "flex-start" }}
+                                sx={{ pl: 0, width: "100%" }}
+                            >
+                                {displayStepIcon(index)}
+                                {displayStepText(step.label, index)}
+                            </Button>
+                            <StepContent>
+                                <Box sx={{ m: 1, minHeight: 300 }}>
+                                    <div>{step.content}</div>
+                                </Box>
+                            </StepContent>
+                        </Step>
+                    ))}
+                </Stepper>
+            </Stack>
         );
     }
 
     return (
         <Stack direction="column">
-            <Stack
-                justifyContent="flex-start"
-                alignItems="stretch"
-                direction="row"
-                sx={{ m: 1 }}
-            >
-                {showStep()}
+            <Stack direction="row">
+                <Stack sx={{ width: "50%" }}>{showStep()}</Stack>
                 <Divider orientation="vertical" flexItem />
-                {showFeedback()}
+                <Stack sx={{ width: "50%" }}>{content}</Stack>
             </Stack>
-            {false && controlState.progress === 1 && (
-                <Box sx={{ width: "100%" }}>
-                    <LinearProgress />
-                </Box>
-            )}
-            <Divider />
-            <WidgetControl
-                state={controlState}
-                onAction={onAction}
-                isInitProcess={initState}
-            />
+            {displayAlert()}
         </Stack>
     );
 };

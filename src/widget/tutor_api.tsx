@@ -28,9 +28,13 @@ export async function SendWriteToFlash(): Promise<string | undefined> {
         console.error(`Error on POST ${dataToSend}.\n${e}`);
         return Promise.reject((e as Error).message);
     }
-};
+}
 
-export async function SendTutorAction(module: any, action: any, settings: any): Promise<string> {
+export async function SendTutorAction(
+    module: any,
+    action: any,
+    settings: any
+): Promise<string> {
     const dataToSend = {
         task: action,
         settings

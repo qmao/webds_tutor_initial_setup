@@ -1,27 +1,9 @@
-import React, {
-    forwardRef,
-    useEffect,
-    useState,
-    useRef,
-    useImperativeHandle
-} from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import {
     Stack,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    IconButton,
-    Avatar,
-    Divider,
     Box,
-    Dialog,
-    DialogTitle,
-    DialogActions,
-    DialogContent,
     Button,
-    TextField,
     Paper,
     Typography
 } from "@mui/material";
@@ -34,9 +16,7 @@ import {
     SendTutorAction
 } from "./tutor_api";
 
-import SettingsIcon from "@mui/icons-material/Settings";
-import { Heatmap } from "./widget_heatmap";
-import { WidgetAttributes } from "./widget_constant";
+import { CommonChart } from "./widget_common_chart";
 
 export const AttributesLocalCBC = {
     title: "Calculate Local CBC",
@@ -49,9 +29,10 @@ export const AttributesLocalCBC = {
 };
 
 interface IProps {
-    state: any;
     updateInitState: any;
-    onAction: any;
+    onDone: any;
+    onContentUpdate: any;
+    updateTuningResult: any;
 }
 
 interface IRange {
@@ -60,25 +41,31 @@ interface IRange {
 }
 //const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const PROGRESS_WIDTH = 250;
-const PROGRESS_HEIGHT = 30;
+const BUTTON_RADIUS = 2;
+const BUTTON_WIDTH = 100;
+const BUTTON_HEIGHT = 36;
+const rpi4 = false;
 
-export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
+export const TutorLocalCBC = (props: IProps) => {
     const [cbcCurrent, setCbcCurrent] = useState<number[]>([]);
     const [cbcPrev, setCbcPrev] = useState<number[]>([]);
-    const [openDialog, setOpenDialog] = useState(false);
     const [progress, setProgress] = useState(0);
     const [frameCount, setFrameCount] = useState(10);
+    const [state, setState] = useState("idle");
 
     const cbcRange = useRef<IRange[]>([]);
 
     const [imageProcessing, setImageProcessing] = useState(false);
-    const [imageA, setImageA] = useState([]);
-    const [imageB, setImageB] = useState([]);
+    const imageA = useRef([]);
+    const imageB = useRef([]);
+
+    const preRange = useRef([0, 0]);
+    const postRange = useRef([0, 0]);
 
     const eventSource = useRef<undefined | EventSource>(undefined);
     const eventError = useRef(false);
     const dataReady = useRef(false);
+    const sseTimer = useRef(0);
 
     function convertCbcToString(cbc: any) {
         let strValue = cbc.map((v: any, i: any) => {
@@ -97,14 +84,11 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         let value = cbc.map((v: any, i: any) => {
             if (v === 0) {
                 return 32;
-            }
-            else if (v > 0) {
+            } else if (v > 0) {
                 return v * 2;
+            } else {
+                return 0 - v * 2 + 32;
             }
-            else {
-                return 0 - (v * 2) + 32;
-            }
-
         });
         return value;
     }
@@ -119,34 +103,6 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         }
     }
 
-    /*
-    async function qmaoTestSSE() {
-        const count = 10;
-        setProgress(0);
-        for (let i = 0; i < count + 1; i++) {
-            await delay(100);
-            setProgress((100 / count) * i);
-        }
-
-        GetLocalCBC()
-            .then(() => {
-                return SendGetImage("baseline");
-            })
-            .then((ret) => {
-                return setImageB(ret);
-            })
-            .then(() => {
-                dataReady.current = true;
-                setImageProcessing(false);
-            })
-            .catch((err) => {
-                dataReady.current = true;
-                setImageProcessing(false);
-                alert(err);
-            });
-    }
-    */
- 
     const eventType = "LocalCBC";
     const eventRoute = "/webds/tutor/event";
 
@@ -155,23 +111,86 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
 
         if (data.state === "run") {
             setProgress(data.progress);
-        }
-        else if (data.state === "stop") {
+        } else if (data.state === "stop") {
             setCbcCurrent(convertCbcToString(data.data));
             SendGetImage("baseline")
                 .then((ret) => {
-                    setImageB(ret);
+                    imageB.current = ret;
                     dataReady.current = true;
                     setImageProcessing(false);
-                    props.onAction("progress");
+                    setState("done");
                 })
                 .catch((err) => {
                     dataReady.current = true;
                     setImageProcessing(false);
-                    props.onAction("done");
+                    alert("eventHandler error");
+                    alert(err);
+                    setState("start");
                 });
         }
     };
+
+    function getImageRange(image: any) {
+        var maxRow = image.map(function (row: any) {
+            return Math.max.apply(Math, row);
+        });
+        var max = Math.max.apply(null, maxRow);
+
+        var minRow = image.map(function (row: any) {
+            return Math.min.apply(Math, row);
+        });
+        var min = Math.min.apply(null, minRow);
+        console.log(min, max);
+        return [min, max];
+    }
+
+    function drawChart() {
+        preRange.current = getImageRange(imageA.current);
+        postRange.current = getImageRange(imageB.current);
+        return (
+            <CommonChart
+                preParams={preRange.current}
+                postParams={postRange.current}
+            />
+        );
+    }
+
+    function updateContent(content: any) {
+        props.onContentUpdate(content);
+    }
+
+    async function testSSE() {
+        let counter = 0;
+
+        sseTimer.current = setInterval(() => {
+            counter = counter + 1;
+            setProgress(counter);
+            if (counter === 100) {
+                clearInterval(sseTimer.current);
+
+                SendGetImage("baseline")
+                    .then((ret) => {
+                        imageB.current = ret;
+                        dataReady.current = true;
+                        setImageProcessing(false);
+                        setState("done");
+
+                        updateContent(drawChart());
+                        props.updateTuningResult({
+                            preParams: preRange.current,
+                            postParams: postRange.current
+                        });
+                    })
+                    .catch((err) => {
+                        dataReady.current = true;
+                        setImageProcessing(false);
+                        alert("eventHandler error");
+                        alert(err);
+                        setState("start");
+                    });
+            }
+        }, 5);
+    }
 
     const removeEvent = () => {
         const SSE_CLOSED = 2;
@@ -199,15 +218,10 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
         eventSource.current!.addEventListener("error", errorHandler, false);
     };
 
-    const handleSelectChange = (value: any, index: number) => {
-        let newCbc: any = [...cbcCurrent];
-        newCbc[index] = value;
-        setCbcCurrent(newCbc);
-    };
-
     useEffect(() => {
         console.log("TUTOR LOCAL CBC INIT");
-
+        setFrameCount(10); //fixme
+        updateContent(<></>);
         props.updateInitState(false);
 
         GetLocalCBC().then((cbc) => {
@@ -238,304 +252,86 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
             });
     }
 
-    useImperativeHandle(ref, () => ({
-        async action(action: any) {
-            let data;
-            switch (action) {
-                case "start":
-                    setProgress(0);
-                    setImageProcessing(true);
-                    dataReady.current = false;
-                    try {
-                        let image = await SendGetImage("baseline");
-                        setImageA(image);
+    async function onAction(action: any) {
+        let data;
+        console.log("ON ACTION:", action);
+        switch (action) {
+            case "start":
+                setState("process");
+                setProgress(0);
+                setImageProcessing(true);
+                dataReady.current = false;
+
+                let image = await SendGetImage("baseline");
+                imageA.current = image;
+                try {
+                    if (rpi4) {
                         addEvent();
+
                         await SendCollectCBC();
-                    } catch (err) {
-                        alert(err);
+                    } else {
+                        //await SendCollectCBC();
+                        testSSE();
                     }
-                    break;
-                case "terminate":
+                } catch (err) {
+                    alert(err);
+                }
+                break;
+            case "terminate":
+                if (rpi4) {
                     removeEvent();
                     try {
                         await SendTutorAction("LocalCBC", "terminate", {});
-                    }
-                    catch (e) {
+                    } catch (e) {
                         alert(e.toString());
                     }
-                    dataReady.current = true;
-                    break;
-                case "cancel":
-                    data = await SendUpdateStaticConfig({ imageCBCs: convertStringToCbc(cbcPrev) });
-                    console.log(data);
-                    break;
-                case "apply":
-                    data = cbcCurrent.map((value) => {
-                        let num = Number(value);
-                        if (num === 0) {
-                            return 0;
-                        }
-                        if (num > 0) {
-                            return num * 2;
-                        } else {
-                            num = Math.abs(num) * 2 + 32;
-                            return num;
-                        }
-                    });
-                    await SendUpdateStaticConfig({ imageCBCs: data });
-                    break;
-            }
-        }
-    }));
-
-    function showImage(image: any, title: any) {
-        return (
-            <Stack alignItems="center" justifyContent="center">
-                <Typography>{title}</Typography>
-                <Heatmap image={image} width={300} />
-            </Stack>
-        );
-    }
-
-    function showImages() {
-        if (!imageProcessing) {
-            console.log("A", imageA);
-            console.log("B", imageB);
-            return (
-                <Stack
-                    spacing={5}
-                    direction="row"
-                    sx={{ width: "100%", pt: 3 }}
-                    alignItems="center"
-                    justifyContent="center"
-                >
-                    {showImage(imageA, "Baseline Untuned")}
-                    {showImage(imageB, "Baseline Tuned")}
-                </Stack>
-            );
-        } else {
-            return <></>;
-        }
-    }
-
-    function TutorContent(): JSX.Element {
-        return (
-            <Stack direction="column" spacing={3}>
-                {props.state.apply === 0 && (
-                <Stack alignItems="flex-start" direction="row" spacing={1}>
-                    <Stack alignItems="flex-end" direction="column">
-                        <Box
-                            alignItems="flex-end"
-                            sx={{
-                                border: 0,
-                                //borderColor: "section.main",
-                                width: 120,
-                                height: 38,
-                                mt: 2
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    mt: 1,
-                                    fontSize: 12,
-                                    textAlign: "center"
-                                }}
-                            >
-                                Image CBC (pF)
-              </Typography>
-                        </Box>
-                            <Box
-                                sx={{
-                                    border: 1,
-                                    borderColor: "colors.grey",
-                                    //bgcolor: "section.main",
-                                    width: 120
-                                }}
-                            >
-                                <Typography sx={{ textAlign: "center", fontSize: 10 }}>
-                                    Was (pF)
-                </Typography>
-                            </Box>
-                    </Stack>
-                    <Stack direction="row" style={{ overflow: "auto", width: 600 }}>
-                        {cbcCurrent.map((value, index) => {
-                            return (
-                                <FormControl
-                                    sx={{ my: 2, minWidth: 60 }}
-                                    key={`FormControl-CBC-${value}-${index}`}
-                                >
-                                    <InputLabel
-                                        key={`InputLabel-CBC-${value}-${index}`}
-                                        id="demo-simple-select-helper-label"
-                                        style={{
-                                            fontSize: 16,
-                                            display: "block"
-                                        }}
-                                    >
-                                        R{index}
-                                    </InputLabel>
-                                    <Select
-                                        key={`Select-CBC-${value}-${index}`}
-                                        readOnly={props.state.apply === 1}
-                                        labelId="demo-simple-select-helper-label"
-                                        id="demo-simple-select-helper"
-                                        defaultValue={value}
-                                        value={value}
-                                        label="Age"
-                                        onChange={(e) => handleSelectChange(e.target.value, index)}
-                                        style={{
-                                            borderRadius: 0,
-                                            fontSize: 10,
-                                            fontFamily: "monospace",
-                                            padding: "12px 1px 12px 1px",
-                                            textAlign: "center"
-                                        }}
-                                        IconComponent={() => null}
-                                        inputProps={{
-                                            sx: { padding: "0 !important" }
-                                        }}
-                                    >
-                                        {cbcRange.current.map((element: any) => {
-                                            return (
-                                                <MenuItem
-                                                    key={`FormHelperText-CBC-${value}-${index}-${element.name}`}
-                                                    value={element.value}
-                                                >
-                                                    {element.name}
-                                                </MenuItem>
-                                            );
-                                        })}
-                                    </Select>
-                                    {props.state.apply === 0 && (
-                                        <Box
-                                            key={`FormHelperText-CBC-box-${value}-${index}`}
-                                            sx={{
-                                                border: 1,
-                                                borderColor: "colors.grey",
-                                                //bgcolor: "section.main"
-                                            }}
-                                        >
-                                            <Typography
-                                                key={`FormHelperText-CBC-text-${value}-${index}`}
-                                                sx={{
-                                                    color: "colors.grey",
-                                                    fontSize: 10,
-                                                    fontFamily: "monospace",
-                                                    textAlign: "center"
-                                                }}
-                                            >
-                                                {cbcPrev[index]}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </FormControl>
-                            );
-                        })}
-                    </Stack>
-                  </Stack>
-                )}
-                {props.state.apply === 1 && (
-                    <Stack sx={{ px: 2 }}>
-                        {showImages()}
-                    </Stack>
-                )}
-            </Stack>
-        );
-    }
-
-    function showDescription() {
-        let description;
-        if (props.state.apply === 0) {
-            description = AttributesLocalCBC.description;
-        } else {
-            description = AttributesLocalCBC.descriptionApply;
-        }
-        return (
-            <>
-                {description.map((value) => {
-                    return (
-                        <Typography
-                            variant="subtitle2"
-                            gutterBottom
-                            key={`Typography-CBC-des-${value}`}
-                            sx={{ fontSize: 12 }}
-                            style={{ whiteSpace: 'normal' }}
-                        >
-                            {value}
-                        </Typography>
-                    );
-                })}
-            </>
-        );
-    }
-
-    const handleFrameCountChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        let value = parseInt(event.target.value, 10);
-        if (!isNaN(value)) {
-            setFrameCount(value);
-        }
-    };
-
-    function showDialog() {
-        return (
-            <Dialog onClose={() => setOpenDialog(false)} open={openDialog}>
-                <DialogTitle>Set Frame Count</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        required
-                        id="outlined-required"
-                        defaultValue={frameCount.toString()}
-                        onChange={handleFrameCountChange}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} autoFocus>
-                        Apply
-          </Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
-
-    function showTutor() {
-        return (
-            <Stack spacing={2}>
-                <Stack
-                    direction="row"
-                    alignItems="flex-start"
-                    spacing={3}
-                    sx={{ mx: 2, my: 1 }}
-                >
-                    <Stack direction="column" sx={{ mt: 2 }}>
-                        {showDescription()}
-                    </Stack>
-                    {props.state.apply === 0 &&
-                        <IconButton onClick={() => setOpenDialog(true)}>
-                            <Avatar sx={{ bgcolor: "primary.main" }}>
-                                <SettingsIcon />
-                            </Avatar>
-                        </IconButton>
+                } else {
+                    clearInterval(sseTimer.current);
+                }
+                setState("idle");
+                dataReady.current = true;
+                break;
+            case "cancel":
+                data = await SendUpdateStaticConfig({
+                    imageCBCs: convertStringToCbc(cbcPrev)
+                });
+                console.log(data);
+                setState("start");
+                break;
+            case "apply":
+                data = cbcCurrent.map((value) => {
+                    let num = Number(value);
+                    if (num === 0) {
+                        return 0;
                     }
-                </Stack>
-                <Divider />
-                <Stack sx={{ px: 2 }}>{TutorContent()}</Stack>
-                {showDialog()}
-            </Stack>
-        );
+                    if (num > 0) {
+                        return num * 2;
+                    } else {
+                        num = Math.abs(num) * 2 + 32;
+                        return num;
+                    }
+                });
+                await SendUpdateStaticConfig({ imageCBCs: data });
+                setState("start");
+                break;
+        }
+        //props.onAction(action);
+        console.log("ON ACTION END");
     }
 
     function showProgress() {
         return (
-            <Stack
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                sx={{ minHeight: WidgetAttributes.HeatmapImageHeight }}
-                spacing={2}
-            >
-                <Box sx={{ position: "relative", display: "inline-flex", mr: 1 }}>
+            <Stack direction="row" justifyContent="center" alignItems="center">
+                <Box
+                    sx={{
+                        width: BUTTON_WIDTH,
+                        height: "98%",
+                        position: "relative",
+                        display: "inline-flex",
+                        borderRadius: BUTTON_RADIUS,
+                        overflow: "hidden"
+                    }}
+                >
                     <Box
                         sx={{
                             top: 0,
@@ -550,12 +346,29 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                     >
                         <Paper
                             sx={{
-                                bgcolor: "#46a832",
-                                width: (progress * PROGRESS_WIDTH) / 100,
-                                height: PROGRESS_HEIGHT,
-                                borderRadius: 1,
-                                borser: 1,
-                                ml: "1px"
+                                bgcolor: "#ecebe5",
+                                borderRadius: BUTTON_RADIUS
+                            }}
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            top: 0,
+                            left: 0,
+                            bottom: 0,
+                            right: 0,
+                            position: "absolute",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "left"
+                        }}
+                    >
+                        <Paper
+                            sx={{
+                                bgcolor: "#ffa777",
+                                width: (progress * BUTTON_WIDTH) / 100,
+                                height: "98%",
+                                borderRadius: BUTTON_RADIUS
                             }}
                         />
                     </Box>
@@ -572,16 +385,18 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
                         }}
                     >
                         <Typography variant="overline" display="block">
-                            {progress.toFixed(1) + " %"}
-                        </Typography>
+                            Cancel
+            </Typography>
                     </Box>
-                    <Paper
-                        elevation={2}
-                        id="outlined-size-small"
+                    <Button
+                        onClick={() => {
+                            onAction("terminate");
+                        }}
+                        variant="outlined"
                         sx={{
-                            width: PROGRESS_WIDTH,
-                            height: PROGRESS_HEIGHT,
-                            borderRadius: 1,
+                            width: BUTTON_WIDTH,
+                            height: BUTTON_HEIGHT,
+                            borderRadius: BUTTON_RADIUS,
                             border: 1
                         }}
                     />
@@ -589,5 +404,65 @@ export const TutorLocalCBC = forwardRef((props: IProps, ref: any) => {
             </Stack>
         );
     }
-    return <>{props.state.progress === 0 ? showTutor() : showProgress()}</>;
-});
+
+    function onDone() {
+        let data = cbcCurrent.map((value) => {
+            let num = Number(value);
+            if (num === 0) {
+                return 0;
+            }
+            if (num > 0) {
+                return num * 2;
+            } else {
+                num = Math.abs(num) * 2 + 32;
+                return num;
+            }
+        });
+        props.onDone({ imageCBCs: data });
+    }
+
+    return (
+        <Stack direction="column" spacing={3}>
+            <Typography
+                sx={{
+                    display: "inline-block",
+                    whiteSpace: "pre-line",
+                    fontSize: 12
+                }}
+            >
+                Remove all conductive objects from the sensor. Do not touch the sensor.
+                Press start to begin coarse baseline adjustment. When complete the
+                baseline distribution should appear smaller and closer to center than
+                before tuning.
+      </Typography>
+            <Stack alignItems="center" sx={{ m: 2 }}>
+                {state === "idle" && (
+                    <Button
+                        sx={{ width: BUTTON_WIDTH, borderRadius: BUTTON_RADIUS }}
+                        onClick={() => {
+                            onAction("start");
+                        }}
+                    >
+                        Start
+                    </Button>
+                )}
+                {state === "process" && showProgress()}
+                {state === "done" && (
+                    <Button
+                        disabled={imageProcessing}
+                        sx={{
+                            width: BUTTON_WIDTH,
+                            borderRadius: BUTTON_RADIUS,
+                            backgroundColor: "text.disabled"
+                        }}
+                        onClick={() => {
+                            onDone();
+                        }}
+                    >
+                        Done
+                    </Button>
+                )}
+            </Stack>
+        </Stack>
+    );
+};

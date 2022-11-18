@@ -1,92 +1,123 @@
-import React, {
-    forwardRef,
-    useImperativeHandle,
-    useEffect,
-    useRef
-} from "react";
+import React, { useEffect } from "react";
 
-import {
-    Typography,
-    Stack
-} from "@mui/material";
+import { Typography, Stack, Button } from "@mui/material";
 
-import { SendWriteToFlash } from "./tutor_api";
+import { SendWriteToFlash, SendUpdateStaticConfig } from "./tutor_api";
 
 export const AttributesFinish = {
-    title: "Finish Tuning",
-    description: []
+    title: "Apply Changes"
 };
 
 interface IProps {
-    state: any;
     updateInitState: any;
-    onAction: any;
+    onContentUpdate: any;
+    config: any;
+    onDone: any;
+    onMessage: any;
 }
 
-export const TutorFinish = forwardRef((props: IProps, ref: any) => {
+export const TutorFinish = (props: IProps) => {
+    const [dataReady, setDataReady] = React.useState(
+        Object.keys(props.config).length !== 0
+    );
 
-    const stateRef = useRef(props.state);
-
-    useEffect(() => {
-        stateRef.current = props.state;
-    }, [props.state]);
-
-    useImperativeHandle(ref, () => ({
-        async action(action: any) {
-            let data;
+    async function action(action: any) {
+        let data: any;
+        let message: any = "success";
+        setDataReady(false);
+        try {
             switch (action) {
-                case "toflash":
+                case "toFlash":
                     data = await SendWriteToFlash();
                     console.log(data);
+                    props.onDone({});
+                    setDataReady(true);
+                    break;
+                case "toRAM":
+                    data = await SendUpdateStaticConfig(props.config);
+                    console.log(data);
+                    setDataReady(true);
                     break;
                 default:
                     break;
             }
+            props.onMessage({
+                state: true,
+                severity: "success",
+                message: message
+            });
+        } catch (e) {
+            props.onMessage({
+                state: true,
+                severity: "error",
+                message: e.toString()
+            });
         }
-    }));
+    }
 
     useEffect(() => {
         console.log("TUTOR FINISH INIT", this);
+        //updateContent(<></>);
     }, []);
 
     function showDescription() {
         return (
             <>
-                <Typography variant="caption" display="block" sx={{ fontWeight: 'bold'}}>
-                    Write To FLASH
-                </Typography>
                 <Typography
                     variant="caption"
                     display="block"
                     gutterBottom
-                    sx={{ pl: 2 }}
+                    sx={{
+                        display: "inline-block",
+                        whiteSpace: "pre-line",
+                        fontSize: 12
+                    }}
                 >
-                    All changes will be permanent and will be used even after the sensor
-                    firmware restart.
-                </Typography>
-                <Typography variant="caption" display="block" sx={{ fontWeight: 'bold' }}>
-                    Skip
-                </Typography>
-                <Typography
-                    variant="caption"
-                    display="block"
-                    gutterBottom
-                    sx={{ pl: 2 }}
-                >
-                    All changes will be applied to the RAM and will be reset to default
-                    after the sensor firmware restart
-                </Typography>
+                    Review all changes in the validation panel on the right. When you are
+                    happy with the changes. write them to RAM for temporary usage or Flash
+                    for permanent usage.
+        </Typography>
             </>
         );
     }
 
     return (
-        <Stack spacing={2}>
+        <Stack spacing={2} direction="column">
             <Stack direction="row" alignItems="flex-start" spacing={3} sx={{ m: 1 }}>
-                <Stack direction="column" sx={{mt: 5, ml: 1}}>
-                    {props.state.toflash && showDescription()}
-                </Stack>
+                <Stack direction="column">{showDescription()}</Stack>
+            </Stack>
+            <Stack
+                direction="row"
+                spacing={4}
+                alignItems="center"
+                justifyContent="space-evenly"
+                sx={{ m: 2 }}
+            >
+                <Button
+                    disabled={dataReady === false}
+                    sx={{
+                        width: 125,
+                        borderRadius: 2
+                    }}
+                    onClick={() => {
+                        action("toRAM");
+                    }}
+                >
+                    Write to RAM
+        </Button>
+                <Button
+                    disabled={dataReady === false}
+                    sx={{
+                        width: 125,
+                        borderRadius: 2
+                    }}
+                    onClick={() => {
+                        action("toFlash");
+                    }}
+                >
+                    Write to Flash
+        </Button>
             </Stack>
         </Stack>
     );
-});
+};
