@@ -33,6 +33,7 @@ interface IProps {
     onDone: any;
     onContentUpdate: any;
     updateTuningResult: any;
+    onBusy: any;
 }
 
 interface IRange {
@@ -137,6 +138,7 @@ export const TutorLocalCBC = (props: IProps) => {
         } else if (data.state === "stop") {
             setCbcCurrent(convertCbcToString(data.data));
             getPostImage();
+            props.onBusy(false);
         }
     };
 
@@ -248,6 +250,7 @@ export const TutorLocalCBC = (props: IProps) => {
         console.log("ON ACTION:", action);
         switch (action) {
             case "start":
+                props.onBusy(true);
                 setState("process");
                 setProgress(0);
                 setImageProcessing(true);
@@ -280,6 +283,7 @@ export const TutorLocalCBC = (props: IProps) => {
                     clearInterval(sseTimer.current);
                 }
                 setState("idle");
+                props.onBusy(false);
                 dataReady.current = true;
                 break;
             case "cancel":

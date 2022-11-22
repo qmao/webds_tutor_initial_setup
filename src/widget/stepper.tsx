@@ -27,6 +27,7 @@ import { TutorFinish, AttributesFinish } from "./tutor_finish";
 interface IProps {
     step: number;
     updateStep: any;
+    onBusy: any;
 }
 
 interface IAlertInfo {
@@ -141,6 +142,7 @@ export const ContentStepper = (props: IProps): JSX.Element => {
                     }}
                     updateInitState={updateInitState}
                     updateTuningResult={updateTuningResult}
+                    onBusy={(busy: any) => {props.onBusy(busy)}}
                 />
             )
         },
@@ -157,6 +159,7 @@ export const ContentStepper = (props: IProps): JSX.Element => {
                     onDone={(data: any) => {
                         onDone(data);
                     }}
+                    onBusy={(busy: any) => { props.onBusy(busy) }}
                 />
             )
         },

@@ -27,6 +27,7 @@ interface IProps {
     onContentUpdate: any;
     onDone: any;
     tuningParams: any;
+    onBusy: any;
 }
 
 const rpi4 = true;
@@ -155,6 +156,7 @@ export const TutorMaxCapacitance = (props: IProps) => {
         setState(action);
         switch (action) {
             case "start":
+                props.onBusy(true);
                 if (rpi4) {
                     addEvent();
                     await SendCollectMaxCap();
@@ -191,6 +193,7 @@ export const TutorMaxCapacitance = (props: IProps) => {
                 }
                 sMax.current = cMax.current;
                 updateContent(drawChart(true));
+                props.onBusy(false);
                 break;
             default:
                 break;

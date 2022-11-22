@@ -38,7 +38,6 @@ export const InitialSetupComponent = (props: IProps): JSX.Element => {
   }
 
   useEffect(() => {
-    setBusy(false);
     checkConfigJson().then(() => {
       setDataReady(true);
     });
@@ -49,7 +48,7 @@ export const InitialSetupComponent = (props: IProps): JSX.Element => {
   }
 
   function ShowContent() {
-    return <ContentStepper updateStep={updateStep} step={step} />;
+      return <ContentStepper updateStep={updateStep} step={step} onBusy={(busy: any) => { setBusy(busy)}}/>;
   }
 
   function showAll() {
