@@ -21,6 +21,8 @@ export const TutorFinish = (props: IProps) => {
         Object.keys(props.config).length !== 0
     );
 
+    const [ram, setRam] = React.useState(false);
+
     async function action(action: any) {
         let data: any;
         let message: any = "success";
@@ -37,6 +39,7 @@ export const TutorFinish = (props: IProps) => {
                     data = await SendUpdateStaticConfig(props.config);
                     console.log(data);
                     setDataReady(true);
+                    setRam(true);
                     break;
                 default:
                     break;
@@ -94,7 +97,7 @@ export const TutorFinish = (props: IProps) => {
                 sx={{ m: 2 }}
             >
                 <Button
-                    disabled={dataReady === false}
+                    disabled={dataReady === false || ram === true}
                     sx={{
                         width: 125,
                         borderRadius: 2

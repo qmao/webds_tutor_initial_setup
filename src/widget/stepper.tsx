@@ -42,6 +42,7 @@ interface ITuningResult {
 }
 
 export const ContentStepper = (props: IProps): JSX.Element => {
+    const [process, setProcess] = useState(false);
     const [initState, setInitState] = useState(false);
     const [activeStep, setActiveStep] = useState(props.step);
     const [content, setContent] = useState(<></>);
@@ -64,6 +65,11 @@ export const ContentStepper = (props: IProps): JSX.Element => {
     useEffect(() => {
         console.log(initState);
     }, []);
+
+    function updateBusy(state: any) {
+        setProcess(state);
+        props.onBusy(state);
+    }
 
     function updateTuningResult(result: ITuningResult) {
         tuningResult.current = result;
@@ -142,7 +148,9 @@ export const ContentStepper = (props: IProps): JSX.Element => {
                     }}
                     updateInitState={updateInitState}
                     updateTuningResult={updateTuningResult}
-                    onBusy={(busy: any) => {props.onBusy(busy)}}
+                    onBusy={(busy: any) => {
+                        updateBusy(busy);
+                    }}
                 />
             )
         },
@@ -159,7 +167,9 @@ export const ContentStepper = (props: IProps): JSX.Element => {
                     onDone={(data: any) => {
                         onDone(data);
                     }}
-                    onBusy={(busy: any) => { props.onBusy(busy) }}
+                    onBusy={(busy: any) => {
+                        updateBusy(busy);
+                    }}
                 />
             )
         },
@@ -254,6 +264,7 @@ export const ContentStepper = (props: IProps): JSX.Element => {
                     {steps.map((step: any, index: any) => (
                         <Step key={step.label}>
                             <Button
+                                disabled={process}
                                 variant="text"
                                 onClick={() => handleStep(index)}
                                 style={{ justifyContent: "flex-start" }}

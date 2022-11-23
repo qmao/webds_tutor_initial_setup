@@ -1,12 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import {
-    Stack,
-    Box,
-    Button,
-    Paper,
-    Typography
-} from "@mui/material";
+import { Stack, Box, Button, Paper, Typography } from "@mui/material";
 
 import {
     SendGetImage,
@@ -181,6 +175,7 @@ export const TutorLocalCBC = (props: IProps) => {
                 clearInterval(sseTimer.current);
 
                 getPostImage();
+                props.onBusy(false);
             }
         }, 5);
     }
