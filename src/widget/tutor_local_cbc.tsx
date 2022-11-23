@@ -358,7 +358,7 @@ export const TutorLocalCBC = (props: IProps) => {
                                 bgcolor: "#ffa777",
                                 width: progress < 2 ? 0 : (progress * BUTTON_WIDTH) / 100,
                                 height: "98%",
-                                borderRadius: BUTTON_RADIUS
+                                borderRadius: 0
                             }}
                         />
                     </Box>
