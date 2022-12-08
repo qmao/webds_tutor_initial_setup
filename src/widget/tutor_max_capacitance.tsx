@@ -253,6 +253,7 @@ export const TutorMaxCapacitance = (props: IProps) => {
             <Stack alignItems="center" sx={{ m: 2 }}>
                 {state === "start" && (
                     <Button
+                        variant="contained"
                         sx={{
                             width: 100,
                             borderRadius: 2
@@ -266,6 +267,7 @@ export const TutorMaxCapacitance = (props: IProps) => {
                 )}
                 {state === "accept" && (
                     <Button
+                        variant="contained"
                         disabled={dataReady === false}
                         sx={{
                             width: 100,
@@ -283,6 +285,7 @@ export const TutorMaxCapacitance = (props: IProps) => {
                 )}
                 {state === "" && (
                     <Button
+                        variant="contained"
                         sx={{
                             width: 100,
                             borderRadius: 2

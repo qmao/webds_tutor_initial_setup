@@ -428,6 +428,7 @@ export const TutorLocalCBC = (props: IProps) => {
             <Stack alignItems="center" sx={{ m: 2 }}>
                 {state === "idle" && (
                     <Button
+                        variant="contained"
                         sx={{ width: BUTTON_WIDTH, borderRadius: BUTTON_RADIUS }}
                         onClick={() => {
                             onAction("start");

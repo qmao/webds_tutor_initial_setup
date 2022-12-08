@@ -97,6 +97,7 @@ export const TutorFinish = (props: IProps) => {
                 sx={{ m: 2 }}
             >
                 <Button
+                    variant="contained"
                     disabled={dataReady === false || ram === true}
                     sx={{
                         width: 125,
@@ -109,6 +110,7 @@ export const TutorFinish = (props: IProps) => {
                     Write to RAM
         </Button>
                 <Button
+                    variant="contained"
                     disabled={dataReady === false}
                     sx={{
                         width: 125,
