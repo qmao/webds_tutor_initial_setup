@@ -1,6 +1,6 @@
 {
   "name": "@webds/tutor_initial_setup",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A JupyterLab extension.",
   "keywords": [
     "jupyter",
