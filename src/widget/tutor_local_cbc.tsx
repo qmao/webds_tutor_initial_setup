@@ -47,6 +47,7 @@ export const TutorLocalCBC = (props: IProps) => {
     const [progress, setProgress] = useState(0);
     const [frameCount, setFrameCount] = useState(10);
     const [state, setState] = useState("idle");
+    const [busy, setBusy] = useState(false);
 
     const cbcRange = useRef<IRange[]>([]);
 
@@ -104,13 +105,13 @@ export const TutorLocalCBC = (props: IProps) => {
                 imageB.current = ret;
                 dataReady.current = true;
                 setImageProcessing(false);
-                setState("done");
 
                 updateContent(drawChart());
                 props.updateTuningResult({
                     preParams: preRange.current,
                     postParams: postRange.current
                 });
+                setState("done");
             })
             .catch((err) => {
                 dataReady.current = true;
@@ -121,12 +122,7 @@ export const TutorLocalCBC = (props: IProps) => {
             });
     }
 
-    const eventType = "LocalCBC";
-    const eventRoute = "/webds/tutor/event";
-
-    const eventHandler = (event: any) => {
-        const data = JSON.parse(event.data);
-
+    const processEvent = (data: any) => {
         if (data.state === "run") {
             setProgress(data.progress);
         } else if (data.state === "stop") {
@@ -134,6 +130,13 @@ export const TutorLocalCBC = (props: IProps) => {
             getPostImage();
             props.onBusy(false);
         }
+    };
+
+    const eventType = "LocalCBC";
+    const eventRoute = "/webds/tutor/event";
+
+    const eventHandler = (event: any) => {
+        processEvent(JSON.parse(event.data))
     };
 
     function getImageRange(image: any) {
@@ -242,7 +245,8 @@ export const TutorLocalCBC = (props: IProps) => {
 
     async function onAction(action: any) {
         let data;
-        console.log("ON ACTION:", action);
+        console.log("ON ACTION:", action, state);
+        setBusy(true);
         switch (action) {
             case "start":
                 props.onBusy(true);
@@ -306,6 +310,7 @@ export const TutorLocalCBC = (props: IProps) => {
                 break;
         }
         //props.onAction(action);
+        setBusy(false);
         console.log("ON ACTION END");
     }
 
@@ -379,6 +384,7 @@ export const TutorLocalCBC = (props: IProps) => {
             </Typography>
                     </Box>
                     <Button
+                        disabled={ busy}
                         onClick={() => {
                             onAction("terminate");
                         }}
@@ -428,6 +434,7 @@ export const TutorLocalCBC = (props: IProps) => {
             <Stack alignItems="center" sx={{ m: 2 }}>
                 {state === "idle" && (
                     <Button
+                        disabled={busy}
                         variant="contained"
                         sx={{ width: BUTTON_WIDTH, borderRadius: BUTTON_RADIUS }}
                         onClick={() => {
