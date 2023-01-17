@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { ISettingRegistry } from "@jupyterlab/settingregistry";
 
 import { CircularProgress } from "@mui/material";
 
@@ -15,7 +14,6 @@ import { Content } from "./mui_extensions/Content";
 import { Controls } from "./mui_extensions/Controls";
 
 interface IProps {
-  settingRegistry: ISettingRegistry;
 }
 
 export const InitialSetupComponent = (props: IProps): JSX.Element => {
