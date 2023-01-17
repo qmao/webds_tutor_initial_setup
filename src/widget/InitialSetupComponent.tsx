@@ -7,7 +7,7 @@ import { ContentStepper } from "./stepper";
 import { ThemeProvider } from "@mui/material/styles";
 import WidgetControl from "./widget_control";
 
-import { WebDSService } from "@webds/service";
+import { webdsService } from './local_exports';
 import { WidgetAttributes } from "./widget_constant";
 
 import { Canvas } from "./mui_extensions/Canvas";
@@ -15,7 +15,6 @@ import { Content } from "./mui_extensions/Content";
 import { Controls } from "./mui_extensions/Controls";
 
 interface IProps {
-  service: WebDSService;
   settingRegistry: ISettingRegistry;
 }
 
@@ -26,12 +25,12 @@ export const InitialSetupComponent = (props: IProps): JSX.Element => {
 
   async function checkConfigJson() {
     let ret;
-    if (props.service.pinormos) {
-      const external = props.service.pinormos.isExternal();
+      if (webdsService .pinormos) {
+          const external = webdsService.pinormos.isExternal();
       if (external) {
-        ret = await props.service.packrat.cache.addPublicConfig();
+          ret = await webdsService.packrat.cache.addPublicConfig();
       } else {
-        ret = await props.service.packrat.cache.addPrivateConfig();
+          ret = await webdsService.packrat.cache.addPrivateConfig();
       }
       console.log(ret);
     }
@@ -75,7 +74,7 @@ export const InitialSetupComponent = (props: IProps): JSX.Element => {
     );
   }
 
-  const theme = props.service.ui.getWebDSTheme();
+    const theme = webdsService.ui.getWebDSTheme();
 
   return (
     <>

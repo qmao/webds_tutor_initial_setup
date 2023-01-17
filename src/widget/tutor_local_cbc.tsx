@@ -384,7 +384,7 @@ export const TutorLocalCBC = (props: IProps) => {
             </Typography>
                     </Box>
                     <Button
-                        disabled={ busy}
+                        disabled={busy}
                         onClick={() => {
                             onAction("terminate");
                         }}

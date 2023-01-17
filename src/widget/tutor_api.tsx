@@ -1,4 +1,4 @@
-import { requestAPI } from "../handler";
+import { requestAPI } from './local_exports';
 
 export async function SendUpdateStaticConfig(dataToSend: any): Promise<string> {
     try {
