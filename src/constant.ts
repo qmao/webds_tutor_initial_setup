@@ -6,7 +6,7 @@ export const Attributes = {
   "id": "webds_tutor_initial_setup_widget",
   "label": "Initial Setup",
   "caption": "Initial Setup",
-  "category": "Touch - Config Library",
+  "category": "Device - Config Library",
   "rank": 30,
   "icon": extensionTutorInitialSetupIcon
 }
