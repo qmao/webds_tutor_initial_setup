@@ -15,7 +15,7 @@ import { CommonChart } from "./widget_common_chart";
 export const AttributesLocalCBC = {
     title: "Calculate Local CBC",
     description: [
-        `Do not touch the sensor, and press "Start CBC calculation" button. WebDS will suggest new setting after calculation.`
+        `Remove all conductive objects from the sensor. Do not touch the sensor. Press start to begin coarse baseline adjustment. When complete the baseline distribution should appear smaller and closer to center than before tuning.`
     ],
     descriptionApply: [
         `Compare baseline images. Press "Cancel" button to recalculate local CBC, or press "Apply" button to apply tuning result.`
