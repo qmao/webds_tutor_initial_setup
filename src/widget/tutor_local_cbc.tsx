@@ -231,6 +231,10 @@ export const TutorLocalCBC = (props: IProps) => {
             }
             return ret;
         });
+
+        return () => {
+            removeEvent();
+        };
     }, []);
 
     async function SendCollectCBC() {

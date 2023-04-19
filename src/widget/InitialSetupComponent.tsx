@@ -51,7 +51,7 @@ export const InitialSetupComponent = (props: IProps): JSX.Element => {
   function showAll() {
     return (
       <Canvas
-        title="Initial Setup"
+        title="Local CBC and CSat"
         sx={{ width: WidgetAttributes.rootWidgetWidth + 24 * 2 }}
       >
         <Content>{ShowContent()}</Content>
