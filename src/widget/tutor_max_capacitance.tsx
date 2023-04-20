@@ -222,6 +222,10 @@ export const TutorMaxCapacitance = (props: IProps) => {
             props.updateInitState(true);
             cDefaultMax.current = data;
         });
+
+        return () => {
+            removeEvent();
+        };
     }, []);
 
     function showDescription() {
