@@ -30,7 +30,6 @@ interface IProps {
     onBusy: any;
 }
 
-const rpi4 = true;
 export const TutorMaxCapacitance = (props: IProps) => {
     const [dataReady, setDataReady] = React.useState(false);
     const [state, setState] = React.useState("");
@@ -56,7 +55,6 @@ export const TutorMaxCapacitance = (props: IProps) => {
         if (data.state === "run") {
             cMax.current = data.value.cum_max;
             sMax.current = data.value.max;
-            updateContent(drawChart(false));
         }
     };
 
@@ -114,11 +112,6 @@ export const TutorMaxCapacitance = (props: IProps) => {
             });
     }
 
-    function randomIntFromInterval(min: any, max: any) {
-        // min and max included
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
     function drawChart(last: any) {
         return (
             <CommonChart
@@ -131,23 +124,10 @@ export const TutorMaxCapacitance = (props: IProps) => {
         );
     }
 
-    async function testSSE() {
-        //signalCumulativeMax.current;
-        //signalMax.current;
-        console.log("testSSE");
-
-        let counter = 0;
-
-        sseTimer.current = setInterval(() => {
-            counter = counter + 1;
-            let r = randomIntFromInterval(100, 300);
-
-            if (r > cMax.current) {
-                cMax.current = r;
-            }
-            sMax.current = r;
-            updateContent(drawChart(false));
-        }, 100);
+    async function updateCapChart() {
+        updateContent(drawChart(false));
+        if (sseTimer.current === 0) return;
+        requestAnimationFrame(updateCapChart);
     }
 
     async function action(action: any) {
@@ -157,12 +137,12 @@ export const TutorMaxCapacitance = (props: IProps) => {
         switch (action) {
             case "start":
                 props.onBusy(true);
-                if (rpi4) {
-                    addEvent();
-                    await SendCollectMaxCap();
-                } else {
-                    testSSE();
-                }
+
+                addEvent();
+                sseTimer.current = 1;
+                updateCapChart();
+                await SendCollectMaxCap();
+
                 break;
             case "apply":
                 data = await SendUpdateStaticConfig({
@@ -183,14 +163,11 @@ export const TutorMaxCapacitance = (props: IProps) => {
                 console.log(data);
                 break;
             case "accept":
-                if (rpi4) {
-                    removeEvent();
-                    await SendTerminateMaxCap();
-                    setDataReady(true);
-                } else {
-                    clearInterval(sseTimer.current);
-                    setDataReady(true);
-                }
+                sseTimer.current = 0;
+                removeEvent();
+                await SendTerminateMaxCap();
+                setDataReady(true);
+
                 sMax.current = cMax.current;
                 updateContent(drawChart(true));
                 props.onBusy(false);
